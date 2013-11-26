@@ -1,0 +1,53 @@
+: include "headers/contest.tx"
+
+<article class="standings">
+  <header>
+    <: $contest.name :>
+    : if $contest_status {
+    (<: $contest_status :>)
+    : }
+  </header>
+  <table class="scoreboard">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th class="points">Score</th>
+        <th class="penalty">Time</th>
+        : for $problems -> $problem {
+        <th class="problem"><a href="/contest/<: $contest.id :>/problem/<: $problem.shortname :>" title="<: $problem.name :>"><: $problem.shortname :></a></th>
+        : }
+      </tr>
+    </thead>
+    <tbody>
+      : for $rankings -> $row {
+      <tr>
+        <td><img class="flag" src="/static/images/flags/uk-small.png"/><: $row.user.realname || $row.user.shortname :></td>
+        <td class="points score"><: $row.score :></td>
+        <td class="penalty score"><: $row.penalty :></td>
+        : for $problems -> $problem {
+        <td class="<: if $row[$problem.id].when { 'correct' } elsif $row[$problem.id].judging {'judging'} elsif $row[$problem.id].attempts { 'wrong' } else { '' } :>"><:
+          if $row[$problem.id] {
+            if $row[$problem.id].judging {
+              '?'
+            } else {
+              if $row[$problem.id].when { '+' } else { '-' }
+              if $row[$problem.id].attempts > 0 { $row[$problem.id].attempts }
+            }
+            if $row[$problem.id].when {
+              :><span class="problem_penalty"><: $row[$problem.id].penalty :></span><:
+            }
+          }
+        :></td>
+        : }
+      </tr>
+      : }
+      <tr><td colspan="3"></td>
+      : for $problems -> $prob {
+      <td class="attempts"><: if $attempts[$prob.id] { $attempts[$prob.id].solved :>/<: $attempts[$prob.id].attempts } :></td>
+      : }
+      </tr>
+    </tbody>
+  </table>
+</article>
+
+: include "footers/contest.tx"

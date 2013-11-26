@@ -1,0 +1,44 @@
+: include "headers/contest.tx"
+
+<article class="submission">
+  <header>
+    <: $submission.user_id.realname || $submission.user_id.username :>'s submission for <a href="/contest/<: $contest.id :>/problem/<: $submission.problem_id.shortname || '?' :>"><: $submission.problem_id.name :></a> (<: $submission.status :>)
+  </header>
+  <section class="source">
+    <code><pre><: $source :></pre></code>
+  </section>
+  <header>
+    Sample test results
+  </header>
+  <section class="samples">
+    <table class="samples">
+      <thead>
+        <tr>
+          <th>Input</th>
+          <th>Model</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+      : for $tests -> $test {
+        <tr title="<: $test.type :> #<: $test.id :>" class="<:
+          1? ''
+        : $test.status == 'JUDGING'
+       || $test.status == 'WAITING'?
+            'pending'
+        : $test.status == 'OK'?
+            'correct'
+        : $test.status == 'TIME-LIMIT'?
+            'timelimit'
+        :   'incorrect':>">
+          <td><pre><: $test.input :></pre></td>
+          <td><pre><: $test.output :></pre></td>
+          <td><pre><: $test.received :></pre></td>
+        </tr>
+      : }
+      </tbody>
+    </table>
+  </section>
+</article>
+
+: include "footers/contest.tx"

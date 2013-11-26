@@ -1,0 +1,38 @@
+: include "headers/contest.tx"
+
+<article class="startpage">
+  <header>
+    <: $contest.name :>
+  </header>
+  <form action="/contest/<: $contest.id :>/problems" method="POST">
+    <fieldset>
+      :
+      : if $until_end < 0 {
+      :
+      <p><strong>Your submission window has now expired.</strong></p>
+      You will receive an email after all other participants' windows have completed.
+      :
+      : } elsif $since_start < 0 {
+      :
+      The contest will start at <: $contest.start_time.ymd :> / <: $contest.start_time.hms :>.
+      :
+      : } elsif $window {
+      :
+      <p><strong>Your session has now started.</strong></p>
+      <p><a href="/contest/<: $contest.id :>/problems">Click here</a> to access the problems.</p>
+      :
+      : } else {
+      :
+      <p><strong>You have not started your session yet.</strong></p>
+      <p>It is permitted to start your session at any time within the next <: ($until_end - ($until_end % 3600)) / 3600 :> hours (<: ($until_end - ($until_end % 86400)) / 86400 :> days).</p>
+      <p>The submission window will last for <: '3' :> hours, after which your submit rights will be revoked.</p>
+      <input name="start_contest" type="submit" value="Start the timer now" />
+      <p><em class="danger">Be very careful about clicking that button precipitately.</em></p>
+      :
+      : }
+      :
+    </fieldset>
+  </form>
+</article>
+
+: include "footers/contest.tx"

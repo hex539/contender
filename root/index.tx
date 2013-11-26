@@ -1,0 +1,9 @@
+: include "headers/contest.tx"
+
+<article class="waitpage">
+  <header>
+    Contest will begin soon.
+  </header>
+</article>
+
+: include "footers/contest.tx"

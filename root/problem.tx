@@ -1,0 +1,34 @@
+: include "headers/contest.tx"
+
+<article class="problem">
+  <header>
+    <: $problem.shortname :> - <: $problem.name :>
+  </header>
+  <div style="text-align: center;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>">submit solution</a></div>
+  <section class="statement">
+    <: $statement :>
+  </section>
+  <header>
+    Sample test(s)
+  </header>
+  <section class="samples">
+    <table>
+      <thead>
+        <tr>
+          <th>Input</th>
+          <th>Output</th>
+        </tr>
+      </thead>
+      <tbody>
+      : for $samples -> $sample {
+        <tr>
+          <td class="input" ><pre><: $sample.input :></pre></td>
+          <td class="output"><pre><: $sample.output :></pre></td>
+        </tr>
+      : }
+      </tbody>
+    </table>
+  </section>
+</article>
+
+: include "footers/contest.tx"

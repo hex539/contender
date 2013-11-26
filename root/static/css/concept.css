@@ -1,0 +1,384 @@
+* {
+          box-sizing: border-box;
+       -o-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+
+  outline: none;
+}
+
+body {
+  overflow-y: scroll;
+}
+
+html,body {
+  margin: 0;
+  padding: 0;
+  background: rgb(210,210,210);
+  min-height: 100%;
+  font-family: "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande",Sans-Serif;
+  font-size: 10pt;
+  padding: 4px;
+}
+
+#page {
+  display: block;
+  background: white;
+  padding-bottom: 10pt;
+  min-height: 500pt;
+  border: 1px solid rgb(180,180,180);
+  max-width: 120em;
+  margin: auto;
+}
+
+header {
+  font-weight: bold;
+}
+
+#topbar {
+  position: relative;
+}
+
+#topbar>header {
+  display: block;
+  background: rgb(230,230,230);
+  padding: 0.5em;
+}
+
+#userbox {
+  position: absolute;
+  padding: 0.5em;
+  right: 0;
+  top: 0;
+}
+
+.user {
+  color: rgb(0,0,100);
+  font-weight: bold;
+}
+
+nav {
+  width: 100%;
+  font-size: 0;
+  border-bottom: 1px solid rgb(180,180,180);
+  position: absolute;
+  bottom: 0px;
+}
+
+nav ul.toplinks {
+  margin: 0;
+  padding: 0;
+  padding-left: 20px;
+}
+
+nav ul.toplinks * {
+  font-size: 10pt;
+}
+
+nav ul.toplinks>li {
+  display: inline-block;
+  margin-bottom: -1px;
+}
+
+nav ul.toplinks>li a {
+  color: black;
+  display: table-cell;
+  text-decoration: none;
+  padding: 0.25em 0.75em;
+  border: 1px solid rgba(0,0,0,0);
+  border-bottom: none;
+}
+
+nav ul.toplinks>li a:hover {
+  color: rgb(0,0,100);
+}
+
+nav ul.toplinks>li a.chosen {
+  margin: 0px 0px;
+  border: 1px solid rgb(180,180,180);
+  border-bottom: none;
+  background: white;
+  color: black;
+}
+
+ul.paginator {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+  display: block;
+  padding-left: 10px;
+  height: 25pt;
+  font-size: 0pt;
+  vertical-align: center;
+  cursor: default;
+}
+
+ul.paginator * {
+  font-size: 10pt;
+}
+
+ul.paginator>li>a {
+  outline: 1px solid rgb(200,200,200);
+  background: rgb(230,230,230);
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  min-width: 3.23em;
+  color: black;
+}
+
+ul.paginator>li {
+  display: inline-block;
+  margin: 0.625em 0.0em;
+}
+
+ul.paginator>li>a:not(.chosen) {
+  background: none;
+  outline: none;
+  cursor: pointer;
+}
+
+ul.paginator>li>a.inactive {
+  color: rgb(255,255,255);
+  cursor: default;
+}
+
+ul.paginator>li>a:not(.inactive):hover {
+  outline: 1px solid rgb(200,200,200);
+  color: rgb(0,0,100);
+}
+
+ul.sublinks {
+  text-align: left;
+}
+
+div#tabview {
+  margin: auto auto;
+  max-width: 96em;
+}
+
+div#content {
+  margin-right: 26em;
+}
+
+article {
+  margin: 4pt auto 25pt auto;
+  max-width: 70em;
+}
+
+article.problem header {
+  width: 100%;
+  padding-bottom: 0.5em;
+  text-align: center;
+  font-weight: normal;
+  font-size: 1.5em;
+}
+
+article.problem section {
+  margin: 1em 0.5em;
+}
+
+section.samples table {
+  table-layout: fixed;
+}
+
+section.samples table * {
+  vertical-align: top;
+}
+
+section.samples table td pre {
+  max-height: 20em;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+table {
+  width: 100%;
+}
+
+div#widgets {
+  display: block;
+  margin: 0em 1em;
+  width: 24em;
+  float: right;
+}
+
+div.widget, div.widget>header {
+  border-radius: 4px 4px 0px 0px;
+}
+
+div.widget {
+  border: 1px solid rgb(200,200,200);
+  margin: 0em 0em 1em 0em;
+  width: 100%;
+}
+
+div.widget>header {
+  background: rgb(230,230,230);
+  border-bottom: 1px solid rgb(200,200,200);
+  width: 100%;
+  padding: 4pt;
+}
+
+div.widget>div.inside {
+  padding: 1em 1em;
+}
+
+span.countdown {
+  display: inline-block;
+  width: 100%;
+  padding: 0.5em;
+  text-align: center;
+  font-family: "Consolas", Monospace;
+  font-weight: bold;
+  font-size: 2em;
+}
+
+table {
+  border-collapse: collapse;
+  text-align: left;
+  margin: 1em;
+  width: calc(100% - 2em);
+}
+
+table>tbody>tr {
+  border-top: 1px solid rgb(200,200,200);
+}
+
+table>tbody>tr:nth-child(2n+1) {
+  background: rgb(250,250,250);
+}
+
+img.flag {
+  vertical-align: middle;
+  margin: 0.5em;
+}
+
+th.problem {
+  text-overflow: hidden;
+  text-align: center;
+  width: 4em;
+}
+
+table.scoreboard td.correct, table.scoreboard td.wrong, table.scoreboard td.unsolved, table.scoreboard td.attempts, table.scoreboard td.judging {
+  font-family: "Consolas", Monospace;
+  text-align: center;
+}
+
+table.scoreboard td.score {
+  text-align: right;
+  padding-left: 1em;
+}
+
+table.scoreboard td.correct {
+  font-weight: bold;
+  color: green;
+
+  background:         linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
+  background:     -ms-linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
+  background:    -moz-linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
+  background: -webkit-linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
+}
+
+table.scoreboard td.wrong {
+  color: blue;
+}
+
+table.scoreboard td.judging {
+  color: blue;
+  font-weight: bold;
+}
+
+table.scoreboard td.attempts {
+  color: rgb(180,180,180);
+}
+
+table.scoreboard td .problem_penalty {
+  display: block;
+  font-size: 50%;
+}
+
+.samples table {
+  border-spacing: 0.5em;
+  border-collapse: separate;
+}
+
+.samples th {
+  text-align: center;
+}
+
+.samples td {
+  white-space: pre-wrap;
+  background: rgb(230,230,230);
+  border: 1px solid rgb(200,200,200);
+  font-family: "Consolas", Monospace;
+  padding: 1em;
+}
+
+th.points, th.penalty {
+  width: 4em;
+}
+
+table.submissions .correct {
+  color: green;
+  font-weight: bold;
+}
+
+table.submissions .wrong {
+  color: blue;
+}
+
+table.submissions .judging {
+  color: blue;
+  font-weight: bold;
+}
+
+input, label {
+  margin: 1.0em 0.5em;
+  padding: 0.5em 0.5em;
+  vertical-align: middle;
+  height: auto;
+}
+
+input[type="radio"] {
+  outline: none;
+}
+
+input[type="radio"]:hover, input[type="file"]:hover, label:hover {
+  background: rgb(230,230,230);
+  outline: 1px solid rgb(200,200,200);
+}
+
+input[type="radio"]:checked+label {
+  outline: 1px solid rgb(0,0,0);
+}
+
+#small_problem_set ol {
+  list-style-type: upper-alpha;
+}
+
+.danger {
+  font-weight: bold;
+  color: red;
+}
+
+code pre {
+  padding: 1em;
+  font-size: 8pt;
+  border: 1px solid rgb(180,180,180);
+  background: rgb(230,230,230);
+}
+
+.samples tr.correct td {
+  background: lightgreen;
+}
+
+.samples tr.incorrect td {
+  background: lightred;
+}
+
+.samples tr.judging td {
+  background: blue;
+}

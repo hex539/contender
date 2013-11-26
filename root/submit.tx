@@ -1,0 +1,21 @@
+: include "headers/contest.tx"
+
+<article class="submit">
+  <header>
+    Submit a solution
+    : if $problems.size() == 1 {
+      to "<span id="problemname"><: $problems[0].name :></span>"
+    : }
+  </header>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="file" name="file" />
+    <input name="submit" value="Submit" type="submit" />
+    <fieldset>
+      : for $problems -> $problem {
+      <input type="radio" name="problem" id="problem<: $problem.id :>" value="<: $problem.shortname :>" <: if $problem.id == $problems[0].id { 'checked ' } :>/><label for="problem<: $problem.id :>"><: $problem.name :></label><br/>
+      : }
+    </fieldset>
+  </form>
+</article>
+
+: include "footers/contest.tx"
