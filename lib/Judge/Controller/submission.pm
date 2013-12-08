@@ -80,8 +80,8 @@ sub submission
     my $hl = undef;
 
     if ($ext eq 'py' or $ext eq 'pypy' or $ext eq 'python') {
-      use Syntax::Highlight::Engine::Kate::Perl;
-      $hl = new Syntax::Highlight::Engine::Kate::Perl(substitutions => $substitutions, format_table => format_table);
+      use Syntax::Highlight::Engine::Kate::Python;
+      $hl = new Syntax::Highlight::Engine::Kate::Python(substitutions => $substitutions, format_table => format_table);
     }
     elsif ($ext eq 'cc' or $ext eq 'c' or $ext eq 'cpp' or $ext eq 'cxx') {
       use Syntax::Highlight::Engine::Kate::Cplusplus;
