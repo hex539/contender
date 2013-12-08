@@ -2,20 +2,44 @@ package Judge::Controller::submission;
 use Moose;
 use namespace::autoclean;
 
-use File::Slurp;
 use Database;
-use User;
-use HTML::Defang;
-use Text::Markdown qw(markdown);
-use DateTime::Format::MySQL;
-use HTML::Entities;
-use File::Basename;
+use File::Slurp;
 use File::Spec::Functions;
+use HTML::Defang;
+use HTML::Entities;
+use Problem;
+use Text::Xslate qw(mark_raw);
+use User;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
 my $judgeroot = '/home/judge/data';
+
+sub format_table {
+  {
+     Alert => ["<font color=\"#0000ff\">", "</font>"],
+     BaseN => ["<font color=\"#007f00\">", "</font>"],
+     BString => ["<font color=\"#c9a7ff\">", "</font>"],
+     Char => ["<font color=\"#ff00ff\">", "</font>"],
+     Comment => ["<font color=\"#7f7f7f\"><i>", "</i></font>"],
+     DataType => ["<font color=\"#0000ff\">", "</font>"],
+     DecVal => ["<font color=\"#00007f\">", "</font>"],
+     Error => ["<font color=\"#ff0000\"><b><i>", "</i></b></font>"],
+     Float => ["<font color=\"#00007f\">", "</font>"],
+     Function => ["<font color=\"#007f00\">", "</font>"],
+     IString => ["<font color=\"#ff0000\">", ""],
+     Keyword => ["<b>", "</b>"],
+     Normal => ["", ""],
+     Operator => ["<font color=\"#ffa500\">", "</font>"],
+     Others => ["<font color=\"#b03060\">", "</font>"],
+     RegionMarker => ["<font color=\"#96b9ff\"><i>", "</i></font>"],
+     Reserved => ["<font color=\"#9b30ff\"><b>", "</b></font>"],
+     String => ["<font color=\"#ff0000\">", "</font>"],
+     Variable => ["<font color=\"#0000ff\"><b>", "</b></font>"],
+     Warning => ["<font color=\"#0000ff\"><b><i>", "</b></i></font>"],
+  }
+}
 
 sub submission
   :Chained("/contest/index")
@@ -51,47 +75,25 @@ sub submission
        "&" => "&amp;",
        "\t" => "  ",
     };
-    state $format_table = {
-       Alert => ["<font color=\"#0000ff\">", "</font>"],
-       BaseN => ["<font color=\"#007f00\">", "</font>"],
-       BString => ["<font color=\"#c9a7ff\">", "</font>"],
-       Char => ["<font color=\"#ff00ff\">", "</font>"],
-       Comment => ["<font color=\"#7f7f7f\"><i>", "</i></font>"],
-       DataType => ["<font color=\"#0000ff\">", "</font>"],
-       DecVal => ["<font color=\"#00007f\">", "</font>"],
-       Error => ["<font color=\"#ff0000\"><b><i>", "</i></b></font>"],
-       Float => ["<font color=\"#00007f\">", "</font>"],
-       Function => ["<font color=\"#007f00\">", "</font>"],
-       IString => ["<font color=\"#ff0000\">", ""],
-       Keyword => ["<b>", "</b>"],
-       Normal => ["", ""],
-       Operator => ["<font color=\"#ffa500\">", "</font>"],
-       Others => ["<font color=\"#b03060\">", "</font>"],
-       RegionMarker => ["<font color=\"#96b9ff\"><i>", "</i></font>"],
-       Reserved => ["<font color=\"#9b30ff\"><b>", "</b></font>"],
-       String => ["<font color=\"#ff0000\">", "</font>"],
-       Variable => ["<font color=\"#0000ff\"><b>", "</b></font>"],
-       Warning => ["<font color=\"#0000ff\"><b><i>", "</b></i></font>"],
-    };
 
     (my $ext = $fno) =~ s/^.*\.//g;
     my $hl = undef;
 
     if ($ext eq 'py' or $ext eq 'pypy' or $ext eq 'python') {
       use Syntax::Highlight::Engine::Kate::Perl;
-      $hl = new Syntax::Highlight::Engine::Kate::Perl(substitutions => $substitutions, format_table => $format_table);
+      $hl = new Syntax::Highlight::Engine::Kate::Perl(substitutions => $substitutions, format_table => format_table);
     }
     elsif ($ext eq 'cc' or $ext eq 'c' or $ext eq 'cpp' or $ext eq 'cxx') {
       use Syntax::Highlight::Engine::Kate::Cplusplus;
-      $hl = new Syntax::Highlight::Engine::Kate::Cplusplus(substitutions => $substitutions, format_table => $format_table);
+      $hl = new Syntax::Highlight::Engine::Kate::Cplusplus(substitutions => $substitutions, format_table => format_table);
     }
     elsif ($ext eq 'java') {
       use Syntax::Highlight::Engine::Kate::Java;
-      $hl = new Syntax::Highlight::Engine::Kate::Java(substitutions => $substitutions, format_table => $format_table);
+      $hl = new Syntax::Highlight::Engine::Kate::Java(substitutions => $substitutions, format_table => format_table);
     }
     elsif ($ext eq 'matlab' or $ext eq 'm' or $ext eq 'octave') {
       use Syntax::Highlight::Engine::Kate::Matlab;
-      $hl = new Syntax::Highlight::Engine::Kate::Matlab(substitutions => $substitutions, format_table => $format_table);
+      $hl = new Syntax::Highlight::Engine::Kate::Matlab(substitutions => $substitutions, format_table => format_table);
     }
 
     $source = $hl->highlightText($source) if $hl;
@@ -101,7 +103,7 @@ sub submission
 
   my @test_types = ('sample');
   push @test_types, 'full' if User::get($c) and User::get($c)->administrator;
-  my $tests = tests($submission->problem_id, @test_types);
+  my $tests = Problem::tests($submission->problem_id, @test_types);
 
   for my $test (@$tests) {
     $test->{received} = '';

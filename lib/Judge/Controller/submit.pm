@@ -2,15 +2,8 @@ package Judge::Controller::submit;
 use Moose;
 use namespace::autoclean;
 
-use File::Slurp;
 use Database;
 use User;
-use HTML::Defang;
-use Text::Markdown qw(markdown);
-use DateTime::Format::MySQL;
-use HTML::Entities;
-use File::Basename;
-use File::Spec::Functions;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -24,10 +17,6 @@ sub submit
 
   my ($self, $c, $problem_sn) = @_;
   my $user = User::force($c);
-
-  if ($c->stash->{contest_status} ne 'Running') {
-    return;
-  }
 
   $problem_sn //= $c->request->param('problem');
 
@@ -76,12 +65,16 @@ sub submit
     return;
   }
 
-  my $problems = [db->resultset('problems')->search({
-    contest_id => $c->stash->{contest}->id,
-    (defined $problem_sn? (shortname => $problem_sn): ()),
-  }, {
-    order_by => 'shortname'
-  })->all];
+  my $problems = [];
+  
+  if ($c->stash->{contest_status} eq 'Running') {
+    [db->resultset('problems')->search({
+      contest_id => $c->stash->{contest}->id,
+      (defined $problem_sn? (shortname => $problem_sn): ()),
+    }, {
+      order_by => 'shortname'
+    })->all];
+  }
 
   $c->stash(
     template => 'submit.tx',

@@ -2,15 +2,8 @@ package Judge::Controller::windows;
 use Moose;
 use namespace::autoclean;
 
-use File::Slurp;
 use Database;
 use User;
-use HTML::Defang;
-use Text::Markdown qw(markdown);
-use DateTime::Format::MySQL;
-use HTML::Entities;
-use File::Basename;
-use File::Spec::Functions;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
