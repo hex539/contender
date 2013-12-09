@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+
+# Enable nullglobbing to prevent nasty surprises for 
+# problems without any test-data
+shopt -s nullglob
+
+# Prevent some idiot user from interrupting critical
+# filesystem operations
+trap "echo Kill attempted 1>&2" SIGINT SIGTERM
+
+if [ $# != 2 ]
+  then
+    echo "Usage: $0 JUDGE_ID PROBLEM_ID"
+    exit 1
+  fi
+
+if [ `id -u` != `id -u root` ]
+  then
+    echo "Error: Software must be run as root"
+    exit 1
+  fi
+
+judge_uid=`id -u "judge"`
+judge_gid=`id -g "judge"`
+
+id=$1
+problem=$2
+root="gaols/$id"
+dataroot="/home/judge/data"
+
+# Select a checker script
+checker="$dataroot/problems/$problem/checker"
+if [ ! -f "$checker" ]
+  then
+    checker="./tools/checker-diff"
+  fi
+
+if [ ! -f "$checker" ]
+  then
+    printf "0\tJUDGE-ERROR\n"
+    exit 1
+  fi
+
+directories=( "/etc" "/usr" "/bin" "/dev" "/proc" "/lib" "/lib64" "/tmp" "/sys" )
+
+# Run command inside root directory
+function chroot_setup {
+
+  # Recreate root if it doesn't exist
+  rm -rf ./$root
+  mkdir -p "./$root"
+}
+
+# Clear $root and run the given command list inside
+# with dropped privileges
+function chroot_run {
+  chown -R "$judge_uid:$judge_gid" "./$root"
+
+  # Create links to important locations
+  for dir in "${directories[@]}"
+    do
+      sudo -u"#$judge_uid" -g"#$judge_gid" mkdir -p "./$root$dir"
+      mount --bind "$dir" "./$root$dir"
+      mount -o remount,ro "./$root$dir"
+    done
+
+  # Run command inside ./$root
+  chroot --userspec=$judge_uid:$judge_gid "./$root" "$@"
+
+  # Delete links
+  for dir in "${directories[@]}"
+    do
+      umount -l "./$root$dir" || (echo "ERROR: failed to umount ./$root$dir" && exit 1)
+    done
+}
+
+temp=`mktemp`
+exename="$id"
+cmd="./$exename"
+
+chroot_setup;
+cp $dataroot/submissions/$id/$id.* "./$root/";
+
+
+if [ -f "./$root/$id.cc" ]; then
+  chroot_run "/bin/bash" "-c" " \
+    ulimit -t 10 -f 1048576; \
+    g++ -std=c++11 -O2 -o ./$id.o ./$id.cc -static &>/dev/null; \
+  " 1>&2 2>/dev/null;
+
+  if [ -f "./$root/$id.o" ]
+    then
+      mv "./$root/$id.o" "$temp"
+    else
+      rm -f "$temp"
+    fi
+
+elif [ -f "./$root/$id.c" ]; then
+  chroot_run "/bin/bash" "-c" " \
+    ulimit -t 10 -f 1048576; \
+    gcc std=c11 -O2 -o ./$id.o ./$id.c -static &>/dev/null; \
+  " 1>&2 2>/dev/null;
+
+  if [ -f "./$root/$id.o" ]
+    then
+      mv "./$root/$id.o" "$temp"
+    else
+      rm -f "$temp"
+    fi
+
+elif [ -f "./$root/$id.java" ]; then
+  mv "./$root/$id.java" "./$root/Main.java"
+
+#  was=$(pwd)
+#  cd ./$root;
+#  javac Main.java;
+#  cd $was
+
+  chroot_run "/bin/bash" "-c" " \
+    ulimit -t 10 -f 1048576; \
+    javac ./*.java; \
+  " 1>&2 2>/dev/null;
+
+  if [ -f "./$root/Main.class" ]
+    then
+      was=$(pwd)
+      cd "./$root"
+      tar czf "$id.tar.gz" *.class
+      cd $was
+
+      mv "./$root/$id.tar.gz" "$temp"
+      exename="$id.tar.gz"
+      cmd="tar zxf $id.tar.gz; java -Xmx128m Main"
+    else
+      rm -f "$temp"
+    fi
+
+elif [ -f "./$root/$id.py" ]; then
+  mv "./$root/$id.py" "$temp"
+  cmd="pypy $id"
+
+elif [ -f "./$root/$id.matlab" ]; then
+  mv "./$root/$id.matlab" "$temp"
+  exename="$id.matlab"
+  cmd="octave $exename"
+
+else
+  rm -f "$temp"
+fi
+
+if [ ! -f "$temp" ]
+  then
+    printf "0\tCOMPILE-ERROR\n"
+    exit 1
+  fi
+
+# Check results for each test case
+mkdir -p "$dataroot/runs/$id"
+for ifn in $dataroot/problems/$problem/tests/*.in
+  do
+    # Expected output filename
+    tcp=`echo "$ifn" | sed "s/\.in\$//g"`
+    ofn="$tcp.out"
+
+    # Test case name
+    tcn=`basename "$tcp" | sed "s/\s\+/ /g"`
+
+    # Run actual executable
+    #   time limit: 2s
+    #   memory limit: 512MiB
+    #   file limit: 512MiB
+    chroot_setup;
+    cp "$temp" "./$root/$exename"
+    time_from=`date +%s%N`
+
+    chroot_run "/bin/bash" "-c" " \
+      ulimit -t 3 -v 1048576 -f 1048576; \
+      $cmd 2>/dev/null || echo 'failed' 1>&2; \
+    " \
+      < "$ifn" \
+      1> "$dataroot/runs/$id/$tcn.out" \
+      2> "$dataroot/runs/$id/$tcn.err";
+    time_till=`date +%s%N`
+    duration=$(( $time_till - $time_from ))
+
+    # Interpret results using checker
+    verdict="NO-OUTPUT"
+    if [ $(( $duration >= 2 * 10**9 )) -eq "1" ]
+      then
+        verdict='TIME-LIMIT'
+    elif [ -s "$dataroot/runs/$id/$tcn.err" ]
+      then
+        verdict='RUNTIME-ERROR'
+    elif [ -f "$dataroot/runs/$id/$tcn.out" ]
+      then
+        verdict=`"$checker" "$dataroot/runs/$id/$tcn.out" "$ofn" "$ifn"`
+      fi
+    verdict=`echo -n "$verdict" | sed 's/\s\+$//g'`
+
+    # Convert time to seconds
+    duration=$( bc <<< "scale=2; $duration / (10^9)" )
+
+    # Submit verdict
+    printf "%s\t%s\t%s\n" "$tcn" "$verdict" "$duration"
+  done
+
+rm -f "$temp"
+chown "$judge_uid" "./$root";
+sudo -u"#$judge_uid" -g"#$judge_gid" rm -rf "./$root";
+
+exit 0

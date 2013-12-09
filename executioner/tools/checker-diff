@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Slurp qw(read_file);
+
+sub no_such_file {
+  print "JUDGE-ERROR\n";
+  exit;
+}
+
+die no_such_file unless @ARGV >= 2 and -f $ARGV[0] and -f $ARGV[1];
+
+my $got = read_file($ARGV[0]);
+my $exp = read_file($ARGV[1]);
+
+$got =~ s/\s+/ /g;
+$exp =~ s/\s+/ /g;
+
+$got =~ s/^\s+|\s+$//g;
+$exp =~ s/^\s+|\s+$//g;
+
+if ($got eq $exp) {
+  print "OK\n";
+  exit;
+}
+
+print "WRONG-ANSWER\n";

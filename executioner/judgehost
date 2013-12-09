@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# Note: these package names are outdated and need to be replaced
+use Judge::Database qw(dbh);
+use Judge::Queue qw(dequeue);
+
+my %status_priorities = (
+  'WAITING'       => 0,
+  'JUDGING'       => 1,
+  'COMPILE-ERROR' => 2,
+  'RUNTIME-ERROR' => 3,
+  'TIME-LIMIT'    => 4,
+  'WRONG-ANSWER'  => 5,
+  'OK'            => 6,
+);
+
+while (1) {
+  if (my ($id, $problem_id) = dequeue) {
+    my $judge_status = 'OK';
+    my $time_limit = 1.00;
+
+    print STDERR "running submission $id for problem $problem_id\n";
+    my $results = `./evaluate $id $problem_id 2>/dev/null`;
+    for my $result (split /\n/, $results) {
+      my ($test, $status, $duration) = split /\t/, $result;
+      $duration ||= '0';
+
+      if ($duration > $time_limit) {
+        $status = 'TIME-LIMIT';
+      }
+
+      dbh->do('
+        REPLACE INTO judgements
+                     (submission_id, testcase, status)
+              VALUES (?, ?, ?)',
+        {}, $id, $test, $status);
+
+      if ($status_priorities{$status} < $status_priorities{$judge_status}) {
+        $judge_status = $status;
+      }
+
+      print STDERR "\t$result\n";
+    }
+    print STDERR "\n";
+
+    dbh->do('
+      UPDATE submissions
+         SET status = ?
+       WHERE id = ?',
+      {}, $judge_status, $id);
+  }
+  else {
+    sleep 1;
+  }
+}
