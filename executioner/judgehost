@@ -2,10 +2,8 @@
 
 use strict;
 use warnings;
-
-# Note: these package names are outdated and need to be replaced
-use Judge::Database qw(dbh);
-use Judge::Queue qw(dequeue);
+use Database;
+use feature 'state';
 
 my %status_priorities = (
   'WAITING'       => 0,
@@ -17,8 +15,38 @@ my %status_priorities = (
   'OK'            => 6,
 );
 
+sub dequeue {
+  my $dbh = shift // db->storage->dbh;
+
+  my @result = ();
+
+  my $sth = $dbh->prepare('
+    SELECT id,
+           problem_id
+      FROM submissions
+     WHERE status = "WAITING"');
+
+  $dbh->begin_work;
+
+  $sth->execute();
+  if (my ($id, $problem_id) = $sth->fetchrow_array) {
+    dbh->do('
+      UPDATE submissions
+         SET status = "JUDGING"
+       WHERE id = ?', {}, $id);
+
+    @result = ($id, $problem_id);
+  }
+
+  $dbh->commit;
+
+  return @result;
+}
+
 while (1) {
-  if (my ($id, $problem_id) = dequeue) {
+  my $dbh = db->storage->dbh;
+
+  if (my ($id, $problem_id) = dequeue($dbh)) {
     my $judge_status = 'OK';
     my $time_limit = 1.00;
 
@@ -32,7 +60,7 @@ while (1) {
         $status = 'TIME-LIMIT';
       }
 
-      dbh->do('
+      $dbh->do('
         REPLACE INTO judgements
                      (submission_id, testcase, status)
               VALUES (?, ?, ?)',
@@ -46,7 +74,7 @@ while (1) {
     }
     print STDERR "\n";
 
-    dbh->do('
+    $dbh->do('
       UPDATE submissions
          SET status = ?
        WHERE id = ?',
