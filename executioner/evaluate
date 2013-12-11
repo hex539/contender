@@ -41,13 +41,19 @@ if [ ! -f "$checker" ]
     exit 1
   fi
 
-directories=( "/etc" "/usr" "/bin" "/dev" "/proc" "/lib" "/lib64" "/tmp" "/sys" )
+directories=( "/etc" "/usr" "/bin" "/dev" "/proc" "/lib" "/lib64" "/sys" )
+fakedirs=( "/tmp" )
+
+# Destroy existing root directory
+function chroot_destroy {
+  rm -rf ./$root
+}
 
 # Run command inside root directory
 function chroot_setup {
+  chroot_destroy;
 
   # Recreate root if it doesn't exist
-  rm -rf ./$root
   mkdir -p "./$root"
 }
 
@@ -62,6 +68,12 @@ function chroot_run {
       sudo -u"#$judge_uid" -g"#$judge_gid" mkdir -p "./$root$dir"
       mount --bind "$dir" "./$root$dir"
       mount -o remount,ro "./$root$dir"
+    done
+
+  # Create stub directories for necessary paths
+  for dir in "${fakedirs[@]}"
+    do
+      sudo -u "#$judge_uid" -g"#$judge_gid" mkdir -p "./$root$dir"
     done
 
   # Run command inside ./$root
@@ -205,7 +217,6 @@ for ifn in $dataroot/problems/$problem/tests/*.in
   done
 
 rm -f "$temp"
-chown "$judge_uid" "./$root";
-sudo -u"#$judge_uid" -g"#$judge_gid" rm -rf "./$root";
+chroot_destroy;
 
 exit 0
