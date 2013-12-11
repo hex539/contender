@@ -30,7 +30,7 @@ sub dequeue {
 
   $sth->execute();
   if (my ($id, $problem_id) = $sth->fetchrow_array) {
-    dbh->do('
+    $dbh->do('
       UPDATE submissions
          SET status = "JUDGING"
        WHERE id = ?', {}, $id);
