@@ -8,9 +8,9 @@ shopt -s nullglob
 # filesystem operations
 trap "echo Kill attempted 1>&2" SIGINT SIGTERM
 
-if [ $# != 2 ]
+if [ $# != 2 ] && [ $# != 3 ]
   then
-    echo "Usage: $0 JUDGE_ID PROBLEM_ID"
+    echo "Usage: $0 JUDGE_ID PROBLEM_ID [TIMELIMIT=2]"
     exit 1
   fi
 
@@ -27,6 +27,16 @@ id=$1
 problem=$2
 root="gaols/$id"
 dataroot="/home/judge/data"
+
+timelimit=`perl -e ' \
+  my $res = 10**9; \
+  for (<>) { \
+    chomp; \
+    $_ = int($_ * (10**9)); \
+    $res = $_ if 0 < $_ and $_ <= 60 * (10**9); \
+  } \
+  print "$res\n"; \
+' <<< "$3"`
 
 # Select a checker script
 checker="$dataroot/problems/$problem/checker"
@@ -197,7 +207,7 @@ for ifn in $dataroot/problems/$problem/tests/*.in
 
     # Interpret results using checker
     verdict="NO-OUTPUT"
-    if [ $(( $duration >= 2 * 10**9 )) -eq "1" ]
+    if [ $(( $duration >= $timelimit )) -eq "1" ]
       then
         verdict='TIME-LIMIT'
     elif [ -s "$dataroot/runs/$id/$tcn.err" ]
