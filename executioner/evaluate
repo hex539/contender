@@ -103,7 +103,6 @@ cmd="./$exename"
 chroot_setup;
 cp $dataroot/submissions/$id/$id.* "./$root/";
 
-
 if [ -f "./$root/$id.cc" ]; then
   chroot_run "/bin/bash" "-c" " \
     ulimit -t 10 -f 1048576; \
@@ -132,11 +131,6 @@ elif [ -f "./$root/$id.c" ]; then
 
 elif [ -f "./$root/$id.java" ]; then
   mv "./$root/$id.java" "./$root/Main.java"
-
-#  was=$(pwd)
-#  cd ./$root;
-#  javac Main.java;
-#  cd $was
 
   chroot_run "/bin/bash" "-c" " \
     ulimit -t 10 -f 1048576; \
