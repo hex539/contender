@@ -68,7 +68,7 @@ sub submit
   my $problems = [];
   
   if ($c->stash->{contest_status} eq 'Running') {
-    [db->resultset('problems')->search({
+    $problems = [db->resultset('problems')->search({
       contest_id => $c->stash->{contest}->id,
       (defined $problem_sn? (shortname => $problem_sn): ()),
     }, {
