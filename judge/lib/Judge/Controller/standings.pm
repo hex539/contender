@@ -90,7 +90,8 @@ sub standings
   my @rankings = map {$solved{$_}} sort {
       ($solved{$b}->{score}   <=> $solved{$a}->{score})
    || ($solved{$a}->{penalty} <=> $solved{$b}->{penalty})
-   || (($a->realname || $a->username) cmp ($b->realname || $b->username))
+   || (($solved{$a}->{user}->realname || $solved{$a}->{user}->username)
+   cmp ($solved{$b}->{user}->realname || $solved{$b}->{user}->username))
   } keys %solved;
 
   $c->stash(
