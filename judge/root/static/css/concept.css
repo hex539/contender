@@ -12,12 +12,14 @@ body {
   overflow-y: scroll;
 }
 
+html {
+}
+
 html,body {
   margin: 0;
   padding: 0;
-  background: rgb(210,210,210);
   min-height: 100%;
-  font-family: "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande",Sans-Serif;
+  font-family: "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
   font-size: 10pt;
   padding: 4px;
 }
@@ -27,8 +29,8 @@ html,body {
   background: white;
   padding-bottom: 10pt;
   min-height: 500pt;
-  border: 1px solid rgb(180,180,180);
-  max-width: 120em;
+/*  border: 1px solid rgb(180,180,180);
+*/  max-width: 120em;
   margin: auto;
 }
 
@@ -38,6 +40,8 @@ header {
 
 #topbar {
   position: relative;
+  border: 1px solid rgb(180,180,180);
+  border-bottom: none;
 }
 
 #topbar>header {
@@ -108,7 +112,7 @@ ul.paginator {
   padding: 0;
   display: block;
   padding-left: 10px;
-  height: 25pt;
+  height: 30pt;
   font-size: 0pt;
   vertical-align: center;
   cursor: default;
@@ -119,13 +123,16 @@ ul.paginator * {
 }
 
 ul.paginator>li>a {
-  outline: 1px solid rgb(200,200,200);
+  border: 1px solid rgba(0, 0, 0, 0.0980392);
   background: rgb(230,230,230);
   display: inline-block;
   text-decoration: none;
   text-align: center;
-  min-width: 3.23em;
+  position: relative;
   color: black;
+  margin-right: -1px;
+  min-width: 3.75em;
+  padding: 0.25em 0em;
 }
 
 ul.paginator>li {
@@ -134,19 +141,33 @@ ul.paginator>li {
 }
 
 ul.paginator>li>a:not(.chosen) {
-  background: none;
-  outline: none;
   cursor: pointer;
+  background: linear-gradient(to bottom, rgb(245, 245, 245), rgb(241, 241, 241));
+}
+
+ul.paginator>li>a.chosen {
+  z-index: 1;
+}
+
+ul.paginator>li:first-child>a {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+ul.paginator>li:last-child>a {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
 }
 
 ul.paginator>li>a.inactive {
-  color: rgb(255,255,255);
+  color: rgba(255,255,255, 0.0);
   cursor: default;
 }
 
 ul.paginator>li>a:not(.inactive):hover {
-  outline: 1px solid rgb(200,200,200);
+  border: 1px solid rgb(200,200,200);
   color: rgb(0,0,100);
+  z-index: 2;
 }
 
 ul.sublinks {
@@ -154,6 +175,7 @@ ul.sublinks {
 }
 
 div#tabview {
+  padding-left: 8pt;
   margin: auto auto;
   max-width: 96em;
 }
@@ -211,12 +233,14 @@ div.widget, div.widget>header {
 
 div.widget {
   border: 1px solid rgb(200,200,200);
+  border: none;
   margin: 0em 0em 1em 0em;
   width: 100%;
 }
 
 div.widget>header {
   background: rgb(230,230,230);
+  background: none;
   border-bottom: 1px solid rgb(200,200,200);
   width: 100%;
   padding: 4pt;
@@ -224,6 +248,10 @@ div.widget>header {
 
 div.widget>div.inside {
   padding: 1em 1em;
+}
+
+div.widget.folded>div.inside {
+  display: none;
 }
 
 span.countdown {
@@ -247,13 +275,11 @@ table>tbody>tr {
   border-top: 1px solid rgb(200,200,200);
 }
 
-table>tbody>tr:nth-child(2n+1) {
-  background: rgb(250,250,250);
-}
-
 img.flag {
   vertical-align: middle;
-  margin: 0.5em;
+  margin: 0.25em 0.5em;
+  height: 16px;
+  width: 32px;
 }
 
 th.problem {
@@ -357,6 +383,7 @@ input[type="radio"]:checked+label {
 
 #small_problem_set ol {
   list-style-type: upper-alpha;
+  margin: 0px 0px;
 }
 
 .danger {
