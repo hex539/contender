@@ -41,9 +41,9 @@
         <div id="widgets">
         : for $widgets -> $widget {
           <div class="widget" id="<: $widget.id :>">
-            <header><: $widget.title :></header>
+            <header><:- $widget.title -:></header>
             <div class="inside">
-              <: $widget.text :>
+              <:- $widget.text -:>
             </div>
           </div>
         : }
