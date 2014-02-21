@@ -17,7 +17,7 @@ $(function(){
       ok = true;
     }
     else {
-      window.stopInterval(ival);
+      window.clearInterval(ival);
 
 //      if (ok) {
 //        location.reload();
