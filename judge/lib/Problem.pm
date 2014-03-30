@@ -33,8 +33,8 @@ sub tests {
       push @results, {
         type    => $type,
         id      => int($num),
-        input   => scalar read_file("$testdir/$type$num.in"),
-        output  => scalar read_file("$testdir/$type$num.out"),
+        input   => scalar read_file(catfile($testdir, "$type$num.in")),
+        output  => scalar read_file(catfile($testdir, "$type$num.out")),
       };
     }
   }
