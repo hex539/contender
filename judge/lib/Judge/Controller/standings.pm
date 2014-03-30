@@ -60,6 +60,7 @@ sub standings
 
     if ($sub->status eq 'OK') {
       $solved{$user}->{$prob}->{when} = $sub->time;
+      $solved{$user}->{$prob}->{id} = $sub->id;
       $solved{$user}->{score}++;
       $solved{$user}->{penalty} += $solved{$user}->{$prob}->{attempts} * 20;
       $solved{$user}->{$prob}->{penalty} =

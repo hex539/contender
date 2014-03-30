@@ -326,6 +326,11 @@ table.scoreboard td .problem_penalty {
   font-size: 50%;
 }
 
+table.scoreboard a {
+  color: black;
+  text-decoration: none;
+}
+
 .samples table {
   border-spacing: 0.5em;
   border-collapse: separate;

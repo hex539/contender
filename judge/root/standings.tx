@@ -27,6 +27,9 @@
         : for $problems -> $problem {
         <td class="<: if $row[$problem.id].when { 'correct' } elsif $row[$problem.id].judging {'judging'} elsif $row[$problem.id].attempts { 'wrong' } else { '' } :>"><:
           if $row[$problem.id] {
+            if $row[$problem.id].when {
+              '<a href="/contest/' ~ $contest.id ~ '/submission/' ~ $row[$problem.id].id ~ '">' | mark_raw
+            }
             if $row[$problem.id].judging {
               '?'
             } else {
@@ -35,6 +38,7 @@
             }
             if $row[$problem.id].when {
               :><span class="problem_penalty"><: $row[$problem.id].penalty :></span><:
+              :></a><:
             }
           }
         :></td>
