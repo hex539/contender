@@ -5,25 +5,25 @@ use warnings;
 
 use File::Slurp qw(read_file);
 
-sub no_such_file {
+sub judge_error {
   print "JUDGE-ERROR\n";
   exit;
 }
 
-die no_such_file unless @ARGV >= 2 and -f $ARGV[0] and -f $ARGV[1];
+sub slurp_canonical {
+  my $result = read_file(shift, err_mode => 'carp') // die judge_error;
 
-my $got = read_file($ARGV[0]);
-my $exp = read_file($ARGV[1]);
+  # collapse whitespace and trim both ends
+  $result =~ s/\s+/ /g;
+  $result =~ s/^\s|\s$//g;
 
-$got =~ s/\s+/ /g;
-$exp =~ s/\s+/ /g;
-
-$got =~ s/^\s+|\s+$//g;
-$exp =~ s/^\s+|\s+$//g;
-
-if ($got eq $exp) {
-  print "OK\n";
-  exit;
+  return $result;
 }
 
-print "WRONG-ANSWER\n";
+die judge_error unless @ARGV >= 2;
+
+if (slurp_canonical($ARGV[0]) eq slurp_canonical($ARGV[1])) {
+  print "OK\n";
+} else {
+  print "WRONG-ANSWER\n";
+}
