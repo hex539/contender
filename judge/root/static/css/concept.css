@@ -10,6 +10,7 @@
 
 body {
   overflow-y: scroll;
+  background: #f9f9f9;
 }
 
 html {
@@ -19,18 +20,15 @@ html,body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  font-family: "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+  font-family: "Roboto", "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
   font-size: 10pt;
-  padding: 4px;
 }
 
 #page {
   display: block;
-  background: white;
-  padding-bottom: 10pt;
+  padding: 10pt;
   min-height: 500pt;
-/*  border: 1px solid rgb(180,180,180);
-*/  max-width: 120em;
+  max-width: 120em;
   margin: auto;
 }
 
@@ -40,13 +38,11 @@ header {
 
 #topbar {
   position: relative;
-  border: 1px solid rgb(180,180,180);
-  border-bottom: none;
 }
 
 #topbar>header {
   display: block;
-  background: rgb(230,230,230);
+  background: white;
   padding: 0.5em;
 }
 
@@ -71,7 +67,8 @@ nav {
 }
 
 nav ul.toplinks {
-  margin: 0;
+  max-width: 1200pt;
+  margin: 0px auto;
   padding: 0;
   padding-left: 20px;
 }
@@ -92,17 +89,14 @@ nav ul.toplinks>li a {
   padding: 0.25em 0.75em;
   border: 1px solid rgba(0,0,0,0);
   border-bottom: none;
+  color: #888888;
 }
 
 nav ul.toplinks>li a:hover {
-  color: rgb(0,0,100);
+  color: #444444;
 }
 
 nav ul.toplinks>li a.chosen {
-  margin: 0px 0px;
-  border: 1px solid rgb(180,180,180);
-  border-bottom: none;
-  background: white;
   color: black;
 }
 
@@ -161,6 +155,7 @@ ul.paginator>li:last-child>a {
 
 ul.paginator>li>a.inactive {
   color: rgba(255,255,255, 0.0);
+  visibility: hidden;
   cursor: default;
 }
 
@@ -189,7 +184,18 @@ article {
   max-width: 70em;
 }
 
-article.problem header {
+article section {
+  background: white;
+  padding: 1em 0.5em;
+  margin: 5px 0px;
+  border-radius: 2px;
+}
+
+article p {
+  margin: 1em 2em;
+}
+
+article header {
   width: 100%;
   padding-bottom: 0.5em;
   text-align: center;
@@ -197,12 +203,12 @@ article.problem header {
   font-size: 1.5em;
 }
 
-article.problem section {
-  margin: 1em 0.5em;
-}
-
 section.samples table {
   table-layout: fixed;
+}
+
+fieldset {
+  border: none;
 }
 
 section.samples table * {
@@ -271,8 +277,12 @@ table {
   width: calc(100% - 2em);
 }
 
-table>tbody>tr {
-  border-top: 1px solid rgb(200,200,200);
+table th {
+  padding: 0.25em 0em;
+}
+
+table td {
+  padding: 0.25em 0em;
 }
 
 img.flag {
@@ -302,10 +312,11 @@ table.scoreboard td.correct {
   font-weight: bold;
   color: green;
 
-  background:         linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
-  background:     -ms-linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
-  background:    -moz-linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
-  background: -webkit-linear-gradient(right, white 15%, lightgreen 15%, lightgreen 85%, white 85%);
+  background:         linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
+  background:     -ms-linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
+  background:    -moz-linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
+  background: -webkit-linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
+
 }
 
 table.scoreboard td.wrong {
@@ -331,21 +342,21 @@ table.scoreboard a {
   text-decoration: none;
 }
 
-.samples table {
+section.samples table {
   border-spacing: 0.5em;
   border-collapse: separate;
 }
 
-.samples th {
+section.samples table th {
   text-align: center;
 }
 
-.samples td {
+section.samples table td {
+  background: white;
   white-space: pre-wrap;
-  background: rgb(230,230,230);
-  border: 1px solid rgb(200,200,200);
   font-family: "Consolas", Monospace;
   padding: 1em;
+  border: none;
 }
 
 th.points, th.penalty {

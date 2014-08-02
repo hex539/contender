@@ -1,0 +1,22 @@
+paper-button {
+  margin: 1em;
+  width: 10em;
+}
+
+a.paper-button {
+  background: #4285f4;
+}
+
+paper-button[raisedButton].coloured {
+  background: #4285f4;
+  color: #fff;
+}
+
+paper-button[raisedButton].coloured #ripple,
+paper-button[raisedButton].coloured::shadow #ripple {
+  color: #2a56c6;
+}
+
+paper-button[raisedButton].coloured #focusBg,
+paper-button[raisedButton].coloured::shadow #focusBg {
+}

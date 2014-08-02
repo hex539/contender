@@ -1,0 +1,17 @@
+: include "headers/contest.tx"
+
+<article class="problem">
+  <header>
+    <: $problem.shortname :> - <: $problem.name :>
+  </header>
+  <section class="statement">
+    <: $content :>
+  </section>
+  : for $models -> $model {
+  <section class="source">
+    <code><pre><: $model.source :></pre></code>
+  </section>
+  : }
+</article>
+
+: include "footers/contest.tx"

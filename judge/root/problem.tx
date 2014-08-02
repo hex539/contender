@@ -1,17 +1,21 @@
 : include "headers/contest.tx"
 
 <article class="problem">
-  <header>
-    <: $problem.shortname :> - <: $problem.name :>
-  </header>
-  <div style="text-align: center;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>">submit solution</a></div>
   <section class="statement">
-    <: $statement :>
+    <paper-shadow z="1" />
+    <header>
+      <: $problem.shortname :> - <: $problem.name :>
+    </header>
+    <div id="problem-statement">
+      <: $statement :>
+    </div>
+    <div style="text-align: right;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>"><paper-button raisedButton class="coloured" label="submit solution"></paper-button></a></div>
   </section>
-  <header>
-    Sample test(s)
-  </header>
   <section class="samples">
+    <paper-shadow z="1" />
+    <header>
+      Sample tests<!-- <a href="/contest/<: $contest.id :>/samples/<: $problem.shortname :>.tar.gz">download</a> -->
+    </header>
     <table>
       <thead>
         <tr>

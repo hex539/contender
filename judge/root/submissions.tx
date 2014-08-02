@@ -1,52 +1,55 @@
 : include "headers/contest.tx"
 
 <article class="submissions">
-  <header>
-    <: $contest.name :>
-    : if $contest_status {
-    (<: $contest_status :>)
-    : }
-  </header>
-  : if $pagecount > 1 {
-  <ul class="paginator">
-    <li><a href="/contest/<: $contest.id :>/submissions/page/<: ($page - 1) max 1 :>" class="<: $page == 1? 'inactive': '' :>">&larr;</a></li>
-    : for $pages -> $row {
-    <li><a href="/contest/<: $contest.id :>/submissions/page/<: $row :>" class="<: $row == $page? 'chosen': '' :>"><: $row :></a></li>
-    : }
-    <li><a href="/contest/<: $contest.id :>/submissions/page/<: ($page + 1) min $pagecount :>" class="<: $page == $pagecount? 'inactive': '' :>">&rarr;</a></li>
-  </ul>
-  : }
-  <table class="submissions">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Name</th>
-        <th>Problem</th>
-        <th>Source</th>
-        <th>State</th>
-      </tr>
-    </thead>
-    <tbody>
-      : for $submissions -> $row {
-      <tr>
-        <td><: $row.time.ymd :> <: $row.time.hms :></td>
-        <td><img class="flag" src="/static/images/flags/uk-small.png"/><: $row.user_id.realname || $row.user_id.username:></td>
-        <td><a href="/contest/<: $contest.id :>/problem/<: $row.problem_id.shortname :>">
-          <: $row.problem_id.shortname :> - <: $row.problem_id.name :>
-        </a></td>
-        <td>
-        : if $user && ($user.id == $row.user_id.id || $user.administrator) {
-        <a href="/contest/<: $contest.id :>/submission/<: $row.id :>">source</a>
-        : }
-        </td>
-        <td class="<:
-          if $row.status == 'OK' { 'correct' }
-        elsif $row.status == 'JUDGING' { 'judging' }
-        else { 'wrong' } :>"><: $row.status :></td>
-      </tr>
+  <section>
+    <header>
+      <: $contest.name :>
+      : if $contest_status {
+      (<: $contest_status :>)
       : }
-    </tbody>
-  </table>
+    </header>
+    : if $pagecount > 1 {
+    <ul class="paginator">
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: ($page - 1) max 1 :>" class="<: $page == 1? 'inactive': '' :>">&larr;</a></li>
+      : for $pages -> $row {
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $row :>" class="<: $row == $page? 'chosen': '' :>"><: $row :></a></li>
+      : }
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: ($page + 1) min $pagecount :>" class="<: $page == $pagecount? 'inactive': '' :>">&rarr;</a></li>
+    </ul>
+    : }
+    <table class="submissions">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Name</th>
+          <th>Problem</th>
+          <th>Source</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        : for $submissions -> $row {
+        <tr>
+          <td><: $row.time.ymd :> <: $row.time.hms :></td>
+          <td><img class="flag" src="/static/images/flags/uk-small.png"/><: $row.user_id.realname || $row.user_id.username:></td>
+          <td><a href="/contest/<: $contest.id :>/problem/<: $row.problem_id.shortname :>">
+            <: $row.problem_id.shortname :> - <: $row.problem_id.name :>
+          </a></td>
+          <td>
+          : if $user && ($user.id == $row.user_id.id || $user.administrator) {
+          <a href="/contest/<: $contest.id :>/submission/<: $row.id :>">source</a>
+          : }
+          </td>
+          <td class="<:
+            if $row.status == 'OK' { 'correct' }
+          elsif $row.status == 'JUDGING' { 'judging' }
+          else { 'wrong' } :>"><: $row.status :></td>
+        </tr>
+        : }
+      </tbody>
+    </table>
+    <paper-shadow z-id="1" />
+  </section>
 </article>
 
 : include "footers/contest.tx"

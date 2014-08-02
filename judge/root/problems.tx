@@ -1,13 +1,13 @@
 : include "headers/contest.tx"
 
 <article class="standings">
-  <header>
-    <: $contest.name :>
-    : if $contest_status {
-    (<: $contest_status :>)
-    : }
-  </header>
   <section class="problem-list">
+    <header>
+      <: $contest.name :>
+      : if $contest_status {
+      (<: $contest_status :>)
+      : }
+    </header>
     <table>
       <thead>
         <tr>
@@ -28,6 +28,7 @@
         : }
       </tbody>
     </table>
+    <paper-shadow z-id="1" />
   </section>
 </article>
 
