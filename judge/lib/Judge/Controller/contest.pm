@@ -2,6 +2,7 @@ package Judge::Controller::contest;
 use Moose;
 use namespace::autoclean;
 
+use DateTime;
 use Database;
 use User;
 use HTML::Entities;
@@ -149,7 +150,7 @@ sub index
     until_end => $until_end,
     start_time => $start_time,
 
-    tabs => [
+    tabs => [grep {$_}
       {
         name => "Problems",
         href => "/contest/$id/problems",
@@ -166,11 +167,11 @@ sub index
         name => "Submit",
         href => "/contest/$id/submit",
       },
-      ($contest->windowed and User::get($c) and User::get($c)->administrator?
-        ({
+      ($contest->windowed and User::get($c) and User::get($c)->administrator) &&
+        {
           name => "Windows",
           href => "/contest/$id/windows",
-        }):()),
+        },
     ],
 
     widgets => [
