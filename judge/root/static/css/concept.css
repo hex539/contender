@@ -67,7 +67,8 @@ nav {
 }
 
 nav ul.toplinks {
-  max-width: 1200pt;
+  font-size: 10pt;
+  max-width: 120em;
   margin: 0px auto;
   padding: 0;
   padding-left: 20px;
