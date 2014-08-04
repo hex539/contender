@@ -426,3 +426,9 @@ code pre {
 .samples tr.judging td {
   background: blue;
 }
+
+meter {
+  vertical-align: middle;
+  height: 0.75em;
+  width: 8em;
+}
