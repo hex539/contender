@@ -411,6 +411,7 @@ input[type="radio"]:checked+label {
 code pre {
   padding: 1em;
   font-size: 8pt;
+  font-family: "Consolas", "Liberation Mono", Monospace;
   border: 1px solid rgb(180,180,180);
   background: rgb(230,230,230);
 }
