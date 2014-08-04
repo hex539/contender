@@ -34,7 +34,11 @@
           <td><img class="flag" src="/static/images/flags/uk-small.png"/><: $row.user_id.realname || $row.user_id.username:></td>
           <td><: $row.start_time.ymd :> <: $row.start_time.hms :></td>
           <td><meter value="<: $now.epoch - $row.start_time.epoch - 60 * 60 :>" min="0" max="<: $row.duration :>" title="<: round(($now.epoch - $row.start_time.epoch - 60 * 60) * 100 / ($row.duration max 1)) min 100 :>%"></meter></td>
-          <td><: if $now.epoch - $row.start_time.epoch - 60 * 60 <= $row.duration { 'Running' } else { 'Finished' } :></td>
+          : if $now.epoch - $row.start_time.epoch - 60 * 60 <= $row.duration {
+          <td class="running">Running</td>
+          : } else {
+          <td class="finished">Finished</td>
+          : }
         </tr>
         : }
       </tbody>

@@ -432,3 +432,11 @@ meter {
   height: 0.75em;
   width: 8em;
 }
+
+table.windows td.running {
+  color: black;
+}
+
+table.windows td.finished {
+  color: #888888;
+}
