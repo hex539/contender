@@ -8,6 +8,7 @@
     <code><pre><: $source :></pre></code>
     <paper-shadow z="1" />
   </section>
+  : if $submission.status != 'COMPILE-ERROR' {
   <section>
     <header>
       Sample test results
@@ -43,6 +44,7 @@
     </table>
     <paper-shadow z="1" />
   </section>
+  : }
   : }
 </article>
 
