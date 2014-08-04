@@ -1,12 +1,15 @@
 : include "headers/contest.tx"
 
 <article class="waitpage">
-  <header>
-    <: $contest.name :>
-  </header>
-  <h1>
-    Starts at <: $contest.start_time.ymd :> / <: $contest.start_time.hms :>.
-  </h1>
+  <section>
+    <header>
+      <: $contest.name :>
+    </header>
+    <h1>
+      Starts at <: $contest.start_time.ymd :> / <: $contest.start_time.hms :>.
+    </h1>
+    <paper-shadow z="1" />
+  </section>
 </article>
 
 : include "footers/contest.tx"

@@ -1,15 +1,20 @@
 : include "headers/contest.tx"
 
 <article class="submission">
-  <header>
-    <: $submission.user_id.realname || $submission.user_id.username :>'s submission for <a href="/contest/<: $contest.id :>/problem/<: $submission.problem_id.shortname || '?' :>"><: $submission.problem_id.name :></a> (<: $submission.status :>)
-  </header>
   <section class="source">
+    <header>
+      <: $submission.user_id.realname || $submission.user_id.username :>'s submission for <a href="/contest/<: $contest.id :>/problem/<: $submission.problem_id.shortname || '?' :>"><: $submission.problem_id.name :></a> (<: $submission.status :>)
+    </header>
     <code><pre><: $source :></pre></code>
+    <paper-shadow z="1" />
   </section>
-  <header>
-    Sample test results
-  </header>
+  <section>
+    <header>
+      Sample test results
+    </header>
+    <paper-shadow z="1" />
+  </section>
+  : for $tests -> $test {
   <section class="samples">
     <table class="samples">
       <thead>
@@ -20,7 +25,6 @@
         </tr>
       </thead>
       <tbody>
-      : for $tests -> $test {
         <tr title="<: $test.type :> #<: $test.id :>" class="<:
           1? ''
         : $test.status == 'JUDGING'
@@ -35,10 +39,11 @@
           <td><pre><: $test.output :></pre></td>
           <td><pre><: $test.received :></pre></td>
         </tr>
-      : }
       </tbody>
     </table>
+    <paper-shadow z="1" />
   </section>
+  : }
 </article>
 
 : include "footers/contest.tx"
