@@ -9,14 +9,10 @@
     <paper-shadow z="1" />
   </section>
   : if $submission.status != 'COMPILE-ERROR' {
-  <section>
+  <section class="samples">
     <header>
       Sample test results
     </header>
-    <paper-shadow z="1" />
-  </section>
-  : for $tests -> $test {
-  <section class="samples">
     <table class="samples">
       <thead>
         <tr>
@@ -25,6 +21,12 @@
           <th>Output</th>
         </tr>
       </thead>
+    </table>
+    <paper-shadow z="1" />
+  </section>
+  : for $tests -> $test {
+  <section class="samples">
+    <table class="samples">
       <tbody>
         <tr title="<: $test.type :> #<: $test.id :>" class="<:
           1? ''
