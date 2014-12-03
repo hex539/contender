@@ -63,9 +63,17 @@ sub index
 
   my $contest = db->resultset('contests')->find({id => $id});
   $c->stash(user => User::get($c));
-  return unless $contest;
+
+  if (not defined $contest) {
+    $c->detach('/default');
+  }
+  if (not $contest->visible) {
+    $c->detach('/default') unless User::force($c)->administrator;
+  }
 
   if (exists $c->request->body_parameters->{start_contest} and $contest->windowed) {
+#     User::force($c)->start_window($contest);
+
     my $user = User::force($c);
 
     my $dbh = db->storage->dbh;

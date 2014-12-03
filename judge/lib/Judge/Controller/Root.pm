@@ -5,10 +5,19 @@ use namespace::autoclean;
 BEGIN { extends 'Catalyst::Controller' }
 __PACKAGE__->config(namespace => '');
 
-sub index :Path :Args(0) {
-  my ( $self, $c ) = @_;
+use Settings;
 
-  $c->redirect($c->uri_for('/contest/11/problems'));
+sub index :Path :Args(0) {
+  my ($self, $c) = @_;
+}
+
+sub default :Path {
+  my ($self, $c) = @_;
+  $c->stash(
+    template => '404.tx',
+    title => 'Not Found',
+  );
+   $c->response->status(404);
 }
 
 sub end

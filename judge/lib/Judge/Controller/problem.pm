@@ -18,22 +18,12 @@ my $judgeroot = '/home/judge/data';
 sub problem
   :Chained("/contest/index")
   :PathPart("problem")
-  :Args(1) {
+  :CaptureArgs(1) {
 
   my ($self, $c, $id) = @_;
 
   my $problem = db->resultset('problems')->find({contest_id => $c->stash->{contest}->id, shortname => $id});
-  $c->detach('404') unless $problem;
-
-  my $statement = '';
-
-  eval {
-    use Text::Xslate qw(mark_raw);
-    $statement = read_file(catfile($judgeroot, 'problems', $problem->id, 'statement.markdown'));
-    $statement = markdown $statement;
-    $statement = HTML::Defang->new(fix_mismatched_tags => 1)->defang($statement);
-    $statement = mark_raw($statement);
-  };
+  $c->detach('/default') unless $problem;
 
   my $subtabs = [map {{
     href => '/contest/' . $c->stash->{contest}->id . '/problem/' . $_->shortname,
@@ -49,6 +39,30 @@ sub problem
     subtab => $problem->shortname,
 
     problem => $problem,
+  );
+}
+
+sub view
+  :Chained("problem")
+  :PathPart("")
+  :Args(0) {
+
+  my ($self, $c) = @_;
+
+  my $problem = $c->stash->{problem};
+
+  my $statement = '';
+  eval {
+    $statement = read_file(catfile($judgeroot, 'problems', $problem->id, 'statement.markdown'));
+  };
+  eval {
+    use Text::Xslate qw(mark_raw);
+    $statement = markdown $statement;
+    $statement = HTML::Defang->new(fix_mismatched_tags => 1)->defang($statement);
+    $statement = mark_raw($statement);
+  };
+
+  $c->stash(
     statement => $statement,
     samples => Problem::tests($problem, 'sample'),
   );

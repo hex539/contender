@@ -1,0 +1,11 @@
+: include "headers/site.tx"
+
+<article class="waitpage">
+  <section>
+    <header>
+      404 - Not Found
+    </header>
+  </section>
+</article>
+
+: include "footers/site.tx"
