@@ -1,0 +1,40 @@
+: include "headers/series.tx"
+
+: macro round -> $x { $x }
+
+<article class="series">
+  <section>
+    <header>
+      <: $series.name :>
+    </header>
+  </section>
+  : for ['Running', 'Future', 'Finished'] -> $status {
+  : if $contests[$status].size() > 0 {
+  <section>
+    <header>
+      <: $status :>
+    </header>
+    <table class="windows">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Start</th>
+          <th>Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        : for $contests[$status] -> $row {
+        <tr>
+          <td><a href="/contest/<: $row.id :>/problems"><: $row.name :></a></td>
+          <td><: $row.start_time.ymd :> <: $row.start_time.hms :></td>
+          <td><meter value="<: $now.epoch - $row.start_time.epoch :>" min="0" max="<: $row.duration :>" title="<: round(($now.epoch - $row.start_time.epoch - 60 * 60) * 100 / ($row.duration max 1)) min 100 :>%"></meter></td>
+        </tr>
+        : }
+      </tbody>
+    </table>
+  </section>
+  : }
+  : }
+</article>
+
+: include "footers/series.tx"
