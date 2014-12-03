@@ -1,14 +1,22 @@
 : include "headers/contest.tx"
 
 <article class="problem">
-  <header>
-    <: $problem.shortname :> - <: $problem.name :>
-  </header>
   <section class="statement">
-    <: $content :>
+    <header>
+      <: $problem.shortname :> - <: $problem.name :>
+    </header>
+    <div style="position: absolute; top: 2pt; right: 2pt">
+      <a href="../<: $problem.shortname :>"><paper-toggle-button></paper-toggle-button></a>
+    </div>
+    <div id="problem-statement">
+      <: $content :>
+    </div>
   </section>
   : for $models -> $model {
   <section class="source">
+    <header>
+      C++
+    </header>
     <code><pre><: $model.source :></pre></code>
   </section>
   : }
