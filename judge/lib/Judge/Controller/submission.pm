@@ -15,8 +15,6 @@ use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-my $judgeroot = '/home/judge/data';
-
 sub format_table {
   {
      Alert => ["<font color=\"#0000ff\">", "</font>"],
@@ -67,15 +65,16 @@ sub submission
   my $compiler_output = '';
 
   eval {
-    $compiler_output = read_file("$judgeroot/submissions/$id/compile.log") || '';
+    $compiler_output = read_file(judgeroot . "/submissions/$id/compile.log") || '';
     $compiler_output =~ s/^\s+\n//g;
     $compiler_output =~ s/\s+$//g;
   };
 
   eval {
-    my $fname = `ls $judgeroot/submissions/$id/ | fgrep -v .log`;
+    my $jr = judgeroot;
+    my $fname = `ls "$jr/submissions/$id/" | fgrep -v .log`;
     $fname =~ s/\s//g;
-    $source = read_file("$judgeroot/submissions/$id/$fname");
+    $source = read_file(judgeroot . "/submissions/$id/$fname");
     $source =~ s/^\s+\n//g;
     $source =~ s/\s+$//g;
 
@@ -122,11 +121,11 @@ sub submission
   for my $test (@$tests) {
     $test->{received} = '';
     eval {
-      $test->{received} = read_file(catfile($judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.out'));
+      $test->{received} = read_file(catfile(judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.out'));
     };
     $test->{stderr} = '';
     eval {
-      $test->{stderr} = read_file(catfile($judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.err'));
+      $test->{stderr} = read_file(catfile(judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.err'));
     };
 
     $test->{input} = substr $test->{input}, 0, 2048;

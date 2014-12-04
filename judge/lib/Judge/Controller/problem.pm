@@ -9,11 +9,10 @@ use Problem;
 use HTML::Defang;
 use Text::Markdown qw(markdown);
 use File::Spec::Functions;
+use Settings;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-my $judgeroot = '/home/judge/data';
 
 sub problem
   :Chained("/contest/index")
@@ -53,7 +52,7 @@ sub view
 
   my $statement = '';
   eval {
-    $statement = read_file(catfile($judgeroot, 'problems', $problem->id, 'statement.markdown'));
+    $statement = read_file(catfile(judgeroot, 'problems', $problem->id, 'statement.markdown'));
   };
   eval {
     use Text::Xslate qw(mark_raw);

@@ -13,8 +13,6 @@ use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-my $judgeroot = '/home/judge/data';
-
 sub edit_problem
   :Chained("/problem/problem")
   :PathPart("edit")

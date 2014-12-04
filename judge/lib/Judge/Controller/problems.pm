@@ -8,8 +8,6 @@ use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-my $judgeroot = '/home/judge/data';
-
 sub problems
   :Chained("/contest/index")
   :PathPart("problems")

@@ -11,8 +11,6 @@ use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-my $judgeroot = '/home/judge/data';
-
 sub get_problem_list {
   my ($id) = @_;
 

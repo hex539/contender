@@ -6,11 +6,10 @@ use Database;
 use User;
 use File::Basename;
 use File::Spec::Functions;
+use Settings;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
-
-my $judgeroot = '/home/judge/data';
 
 sub submit
   :Chained("/contest/index")
@@ -53,8 +52,8 @@ sub submit
     $ext = '.matlab' if $ext eq '.octave';
 
     # Copy source to submissions directory
-    my $fn = catfile($judgeroot, 'submissions', $id, "$id$ext");
-    mkdir catdir($judgeroot, 'submissions', $id);
+    my $fn = catfile(judgeroot, 'submissions', $id, "$id$ext");
+    mkdir catdir(judgeroot, 'submissions', $id);
 
     if (not $upload->copy_to($fn)) {
       $dbh->rollback;
