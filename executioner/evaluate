@@ -10,7 +10,7 @@ trap "echo Kill attempted 1>&2" SIGINT SIGTERM
 
 if [ $# != 2 ] && [ $# != 3 ]
   then
-    echo "Usage: $0 JUDGE_ID PROBLEM_ID [TIMELIMIT=2]"
+    echo "Usage: $0 JUDGE_ID PROBLEM_ID [TIMELIMIT=0.5]"
     exit 1
   fi
 
@@ -29,7 +29,7 @@ root="gaols/$id"
 dataroot="/home/judge/data"
 
 timelimit=`perl -e ' \
-  my $res = 10**9; \
+  my $res = 3.0 * (10**9); \
   for (<>) { \
     chomp; \
     $_ = int($_ * (10**9)); \
@@ -97,7 +97,7 @@ function chroot_run {
 }
 
 temp=`mktemp`
-exename="$id"
+exename="submission"
 cmd="./$exename"
 
 chroot_setup;
@@ -105,9 +105,9 @@ cp $dataroot/submissions/$id/$id.* "./$root/";
 
 if [ -f "./$root/$id.cc" ]; then
   chroot_run "/bin/bash" "-c" " \
-    ulimit -t 10 -f 1048576; \
-    g++ -std=c++11 -O2 -o ./$id.o ./$id.cc -static &>/dev/null; \
-  " 1>&2 2>/dev/null;
+    ulimit -t 5 -f 1048576; \
+    g++ -std=c++11 -O2 -o ./$id.o ./$id.cc -static 2>&1; \
+  " &>"$dataroot/submissions/$id/compile.log";
 
   if [ -f "./$root/$id.o" ]
     then
@@ -118,9 +118,9 @@ if [ -f "./$root/$id.cc" ]; then
 
 elif [ -f "./$root/$id.c" ]; then
   chroot_run "/bin/bash" "-c" " \
-    ulimit -t 10 -f 1048576; \
-    gcc std=c11 -O2 -o ./$id.o ./$id.c -static &>/dev/null; \
-  " 1>&2 2>/dev/null;
+    ulimit -t 5 -f 1048576; \
+    gcc std=c11 -O2 -o ./$id.o ./$id.c -static 2>&1; \
+  " &>"$dataroot/submissions/$id/compile.log";
 
   if [ -f "./$root/$id.o" ]
     then
@@ -130,34 +130,34 @@ elif [ -f "./$root/$id.c" ]; then
     fi
 
 elif [ -f "./$root/$id.java" ]; then
-  mv "./$root/$id.java" "./$root/Main.java"
+  main_class=`./tools/detect-java-class < "./$root/$id.java"`
+  mv "./$root/$id.java" "./$root/$main_class.java"
 
   chroot_run "/bin/bash" "-c" " \
-    ulimit -t 10 -f 1048576; \
-    javac ./*.java; \
-  " 1>&2 2>/dev/null;
+    ulimit -t 5 -f 1048576; \
+    javac ./*.java 2>&1; \
+  " &>"$dataroot/submissions/$id/compile.log";
 
-  if [ -f "./$root/Main.class" ]
+  if [ -f "./$root/$main_class.class" ]
     then
-      was=$(pwd)
-      cd "./$root"
+      pushd "./$root" &>/dev/null
       tar czf "$id.tar.gz" *.class
-      cd $was
+      popd &>/dev/null
 
       mv "./$root/$id.tar.gz" "$temp"
       exename="$id.tar.gz"
-      cmd="tar zxf $id.tar.gz; java -Xmx128m Main"
+      cmd="tar zxf $id.tar.gz; java -Xmx128m $main_class"
     else
       rm -f "$temp"
     fi
 
 elif [ -f "./$root/$id.py" ]; then
   mv "./$root/$id.py" "$temp"
-  cmd="pypy $id"
+  cmd="pypy $exename"
 
 elif [ -f "./$root/$id.matlab" ]; then
-  mv "./$root/$id.matlab" "$temp"
-  exename="$id.matlab"
+  mv "./$root/submission.matlab" "$temp"
+  exename="submission.matlab"
   cmd="octave $exename"
 
 else
@@ -187,11 +187,11 @@ for ifn in $dataroot/problems/$problem/tests/*.in
     #   file limit: 512MiB
     chroot_setup;
     cp "$temp" "./$root/$exename"
-    time_from=`date +%s%N`
 
+    time_from=`date +%s%N`
     chroot_run "/bin/bash" "-c" " \
-      ulimit -t 3 -v 1048576 -f 1048576; \
-      $cmd 2>/dev/null || echo 'failed' 1>&2; \
+      ulimit -t 4 -v 1048576 -f 1048576; \
+      $cmd || echo '** NON-ZERO EXIT CODE **' 1>&2; \
     " \
       < "$ifn" \
       1> "$dataroot/runs/$id/$tcn.out" \
@@ -204,6 +204,7 @@ for ifn in $dataroot/problems/$problem/tests/*.in
     if [ $(( $duration >= $timelimit )) -eq "1" ]
       then
         verdict='TIME-LIMIT'
+        echo "Time taken: $duration / $timelimit" >> "$dataroot/runs/$id/$tcn.err"
     elif [ -s "$dataroot/runs/$id/$tcn.err" ]
       then
         verdict='RUNTIME-ERROR'

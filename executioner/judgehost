@@ -48,7 +48,12 @@ while (1) {
 
   if (my ($id, $problem_id) = dequeue($dbh)) {
     my $judge_status = 'OK';
-    my $time_limit = 1.00;
+    my $time_limit = 2.50;
+
+    $dbh->do('
+      DELETE FROM judgements
+            WHERE submission_id = ?',
+      {}, $id);
 
     print STDERR "running submission $id for problem $problem_id\n";
     my $results = `./evaluate $id $problem_id 2>/dev/null`;
@@ -56,6 +61,7 @@ while (1) {
       my ($test, $status, $duration) = split /\t/, $result;
       $duration ||= '0';
 
+      ### TODO: remove this check, the evaluator supports it now
       if ($duration > $time_limit) {
         $status = 'TIME-LIMIT';
       }
@@ -73,6 +79,7 @@ while (1) {
       print STDERR "\t$result\n";
     }
     print STDERR "\n";
+    print STDERR "setting submission $id status to '$judge_status'\n";
 
     $dbh->do('
       UPDATE submissions
