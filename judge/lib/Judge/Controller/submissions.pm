@@ -33,6 +33,10 @@ sub submissions
     }
   }
 
+  if (exists $args{user}) {
+    $results = $results->search({user_id => int($args{user})});
+  }
+
   my $ipp = 20;
   my $pagecount = int(($ipp - 1 + $results->count) / $ipp) || 1;
   $args{page} = int($args{page} || 1);

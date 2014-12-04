@@ -29,11 +29,50 @@ __PACKAGE__->add_columns(
     'data_type'         => 'TIMESTAMP',
     'is_auto_increment' => 0,
     'default_value'     => \'CURRENT_TIMESTAMP',
-    'timezone'          => 'Europe/London',
+    'timezone'          => 'UTC',
     'is_foreign_key'    => 0,
     'name'              => 'timestamp',
     'is_nullable'       => 1,
     'size'              => '0'
+  },
+);
+__PACKAGE__->set_primary_key('id');
+
+package Judge::ORM::series;
+use base 'DBIx::Class';
+use strict;
+use warnings;
+
+__PACKAGE__->load_components(qw/ Core InflateColumn::DateTime/);
+__PACKAGE__->table('series');
+
+__PACKAGE__->add_columns(
+  'id' => {
+    'data_type'         => 'int',
+    'is_auto_increment' => 1,
+    'default_value'     => undef,
+    'is_foreign_key'    => 0,
+    'name'              => 'id',
+    'is_nullable'       => 0,
+    'size'              => '11'
+  },
+  'name' => {
+    'data_type'         => 'VARCHAR',
+    'is_auto_increment' => 0,
+    'default_value'     => undef,
+    'is_foreign_key'    => 0,
+    'name'              => 'name',
+    'is_nullable'       => 1,
+    'size'              => '255'
+  },
+  'shortname' => {
+    'data_type'         => 'VARCHAR',
+    'is_auto_increment' => 0,
+    'default_value'     => undef,
+    'is_foreign_key'    => 0,
+    'name'              => 'shortname',
+    'is_nullable'       => 0,
+    'size'              => '255'
   },
 );
 __PACKAGE__->set_primary_key('id');
@@ -56,6 +95,15 @@ __PACKAGE__->add_columns(
     'is_nullable'       => 0,
     'size'              => '11'
   },
+  'series_id' => {
+    'data_type'         => 'int',
+    'is_auto_increment' => 0,
+    'default_value'     => undef,
+    'is_foreign_key'    => 1,
+    'name'              => 'series_id',
+    'is_nullable'       => 1,
+    'size'              => '11',
+  },
   'name' => {
     'data_type'         => 'VARCHAR',
     'is_auto_increment' => 0,
@@ -69,7 +117,7 @@ __PACKAGE__->add_columns(
     'data_type'         => 'TIMESTAMP',
     'is_auto_increment' => 0,
     'default_value'     => \'CURRENT_TIMESTAMP',
-    'timezone'          => 'Europe/London',
+    'timezone'          => 'UTC',
     'is_foreign_key'    => 0,
     'name'              => 'start_time',
     'is_nullable'       => 1,
@@ -100,7 +148,16 @@ __PACKAGE__->add_columns(
     'is_foreign_key'    => 0,
     'name'              => 'windowed',
     'is_nullable'       => 0,
-    'size'              => '11'
+    'size'              => '1'
+  },
+  'openbook' => {
+    'data_type'         => 'int',
+    'is_auto_increment' => 0,
+    'default_value'     => 0,
+    'is_foreign_key'    => 0,
+    'name'              => 'openbook',
+    'is_nullable'       => 0,
+    'size'              => '1'
   },
 );
 __PACKAGE__->set_primary_key('id');
@@ -193,7 +250,7 @@ __PACKAGE__->add_columns(
     'data_type'         => 'TIMESTAMP',
     'is_auto_increment' => 0,
     'default_value'     => \'CURRENT_TIMESTAMP',
-    'timezone'          => 'Europe/London',
+    'timezone'          => 'UTC',
     'is_foreign_key'    => 0,
     'name'              => 'time',
     'is_nullable'       => 1,
@@ -290,7 +347,7 @@ __PACKAGE__->add_columns(
     'data_type'         => 'TIMESTAMP',
     'is_auto_increment' => 0,
     'default_value'     => \'CURRENT_TIMESTAMP',
-    'timezone'          => 'Europe/London',
+    'timezone'          => 'UTC',
     'is_foreign_key'    => 0,
     'name'              => 'time',
     'is_nullable'       => 1,
@@ -424,7 +481,7 @@ __PACKAGE__->add_columns(
     'data_type'         => 'TIMESTAMP',
     'is_auto_increment' => 0,
     'default_value'     => \'CURRENT_TIMESTAMP',
-    'timezone'          => 'Europe/London',
+    'timezone'          => 'UTC',
     'is_foreign_key'    => 0,
     'name'              => 'start_time',
     'is_nullable'       => 1,
@@ -441,7 +498,13 @@ __PACKAGE__->add_columns(
   },
 );
 
+package Judge::ORM::series;
+
+__PACKAGE__->has_many( 'get_contests', 'Judge::ORM::contests', 'series_id' );
+
 package Judge::ORM::contests;
+
+__PACKAGE__->belongs_to( 'series_id', 'Judge::ORM::series' );
 
 __PACKAGE__->has_many( 'get_problems',  'Judge::ORM::problems',  'contest_id' );
 __PACKAGE__->has_many( 'get_event_log', 'Judge::ORM::event_log', 'contest_id' );
@@ -487,6 +550,8 @@ use strict;
 use warnings;
 
 __PACKAGE__->register_class( 'sessions', 'Judge::ORM::sessions' );
+
+__PACKAGE__->register_class( 'series', 'Judge::ORM::series' );
 
 __PACKAGE__->register_class( 'contests', 'Judge::ORM::contests' );
 

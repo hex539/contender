@@ -22,10 +22,12 @@ sub windows
   return if not $contest->windowed;
 
   my $results = db->resultset('windows')->search({contest_id => $contest->id}, {
-    order_by => {'-desc' => 'start_time'},
+    order_by => {
+      '-desc' => [qw(start_time+duration start_time)],
+    },
   });
 
-  my $ipp = 20;
+  my $ipp = 200;
   my $pagecount = int(($ipp - 1 + $results->count) / $ipp) || 1;
   $args{page} = int($args{page} || 1);
   $args{page} = 1          if $args{page} < 1;
@@ -42,8 +44,10 @@ sub windows
     title => 'Windows',
     tab => 'Windows',
     user => User::force($c),
-
-    windows => \@windows,
+    windows => {
+      Running  => [grep {not ($_->start_time->epoch + $_->duration <= $c->stash->{now}->epoch)} @windows],
+      Finished => [grep {    ($_->start_time->epoch + $_->duration <= $c->stash->{now}->epoch)} @windows],
+    },
     pagecount => $pagecount,
     page => $args{page},
     pages => \@pages,

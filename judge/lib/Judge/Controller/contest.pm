@@ -4,6 +4,7 @@ use namespace::autoclean;
 
 use DateTime;
 use Database;
+use Settings;
 use User;
 use HTML::Entities;
 use feature 'state';
@@ -82,16 +83,16 @@ sub index
       INSERT IGNORE INTO windows (contest_id, user_id, start_time, duration)
            VALUES (?, ?, NOW(), ?)');
 
-    $sth->execute($contest->id, $user->id, $contest->windowed);
+    my $duration = 3 * 60 * 60;
+    $sth->execute($contest->id, $user->id, $duration);
     $dbh->commit;
 
     $c->redirect('http://contest.incoherency.co.uk/contest/' . $contest->id . '/problems');
     $c->detach;
-    return;
   }
 
   my $now = DateTime->now(time_zone => 'Europe/London');
-  my $since_start = $now->epoch - $contest->start_time->epoch - 60 * 60;
+  my $since_start = $now->epoch - $contest->start_time->epoch;
   my $until_end   = $contest->duration - $since_start;
   my $time_elapsed = sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0]);
   my $nice_duration = sprintf('%02d:%02d:%02d', (gmtime $contest->duration)[2,1,0]);
@@ -108,6 +109,7 @@ sub index
       $until_end >= 0? 'Running': 'Finished',
     ),
     now => $now,
+    hashids => hashids,
   );
 
   if ($since_start < 0) {
@@ -131,7 +133,7 @@ sub index
       return;
     }
 
-    $since_start = $now->epoch - $window->start_time->epoch - 60 * 60;
+    $since_start = $now->epoch - $window->start_time->epoch;
     $until_end = $window->duration - $since_start;
     $nice_duration = sprintf('%02d:%02d:%02d', (gmtime ($window->duration))[2,1,0]);
     $start_time = $window->start_time;
@@ -163,6 +165,11 @@ sub index
         name => "Problems",
         href => "/contest/$id/problems",
       },
+#      ($time_elapsed eq 'Finished' or User::get($c) and User::get($c)->administrator) &&
+#        {
+#          name => "Writeups",
+#          href => "/contest/$id/writeups",
+#        },
       {
         name => "Standings",
         href => "/contest/$id/standings",

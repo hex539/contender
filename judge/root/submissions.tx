@@ -37,7 +37,7 @@
           </a></td>
           <td>
           : if $user && ($user.id == $row.user_id.id || $user.administrator) {
-          <a href="/contest/<: $contest.id :>/submission/<: $row.id :>">source</a>
+          <a href="/contest/<: $contest.id :>/submission/<: $hashids.encrypt($row.id) :>">source</a>
           : }
           </td>
           <td class="<:
@@ -48,7 +48,6 @@
         : }
       </tbody>
     </table>
-    <paper-shadow z-id="1" />
   </section>
 </article>
 

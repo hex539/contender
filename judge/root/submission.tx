@@ -4,11 +4,21 @@
   <section class="source">
     <header>
       <: $submission.user_id.realname || $submission.user_id.username :>'s submission for <a href="/contest/<: $contest.id :>/problem/<: $submission.problem_id.shortname || '?' :>"><: $submission.problem_id.name :></a> (<: $submission.status :>)
+      : if $user.administrator {
+      id=<: $submission.id :>
+      : }
     </header>
     <code><pre><: $source :></pre></code>
-    <paper-shadow z="1" />
   </section>
-  : if $submission.status != 'COMPILE-ERROR' {
+  : if $submission.status == 'COMPILE-ERROR' {
+  <section class="source">
+    <header>
+      Compiler Output
+    </header>
+    <code><pre><: $compiler_log :></pre></code>
+  </section>
+  : }
+  : else if $submission.status != 'WAITING' {
   <section class="samples">
     <header>
       Sample test results
@@ -22,29 +32,33 @@
         </tr>
       </thead>
     </table>
-    <paper-shadow z="1" />
   </section>
   : for $tests -> $test {
   <section class="samples">
     <table class="samples">
       <tbody>
-        <tr title="<: $test.type :> #<: $test.id :>" class="<:
-          1? ''
-        : $test.status == 'JUDGING'
+        <tr title="<: $test.type :> #<: $test.id :> - <: $test.status :>" class="<:
+          $test.status == 'JUDGING'
        || $test.status == 'WAITING'?
             'pending'
         : $test.status == 'OK'?
             'correct'
         : $test.status == 'TIME-LIMIT'?
             'timelimit'
+        : $test.status == 'RUNTIME-ERROR'?
+            'runtime-error'
         :   'incorrect':>">
           <td><pre><: $test.input :></pre></td>
           <td><pre><: $test.output :></pre></td>
           <td><pre><: $test.received :></pre></td>
         </tr>
+        : if $test.stderr {
+        <tr>
+          <td colspan="3"><pre><: $test.stderr :></pre></td>
+        </tr>
+        : }
       </tbody>
     </table>
-    <paper-shadow z="1" />
   </section>
   : }
   : }

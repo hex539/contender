@@ -20,8 +20,11 @@ html,body {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  font-family: "Roboto", "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
-  font-size: 10pt;
+}
+
+body {
+  font-family: "Helvetica Neue", "Helvetica", "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+  font-size: 12pt;
 }
 
 #page {
@@ -38,11 +41,12 @@ header {
 
 #topbar {
   position: relative;
+  background: white;
+  box-shadow: 0px 1px 6px rgba(0,0,0,0.5);
 }
 
 #topbar>header {
   display: block;
-  background: white;
   padding: 0.5em;
 }
 
@@ -67,34 +71,30 @@ nav {
 }
 
 nav ul.toplinks {
-  font-size: 10pt;
+  font-size: 12pt;
   max-width: 120em;
   margin: 0px auto;
-  padding: 0;
+  padding: 0px;
   padding-left: 20px;
 }
 
 nav ul.toplinks * {
-  font-size: 10pt;
 }
 
 nav ul.toplinks>li {
   display: inline-block;
   margin-bottom: -1px;
+  position: relative;
 }
 
 nav ul.toplinks>li a {
   color: black;
   display: table-cell;
   text-decoration: none;
-  padding: 0.25em 0.75em;
+  padding: 0.25em 1.0em;
   border: 1px solid rgba(0,0,0,0);
   border-bottom: none;
   color: #888888;
-}
-
-nav ul.toplinks>li a:hover {
-  color: #444444;
 }
 
 nav ul.toplinks>li a.chosen {
@@ -108,13 +108,13 @@ ul.paginator {
   display: block;
   padding-left: 10px;
   height: 30pt;
-  font-size: 0pt;
+  font-size: 0px;
   vertical-align: center;
   cursor: default;
 }
 
 ul.paginator * {
-  font-size: 10pt;
+  font-size: 12pt;
 }
 
 ul.paginator>li>a {
@@ -133,6 +133,7 @@ ul.paginator>li>a {
 ul.paginator>li {
   display: inline-block;
   margin: 0.625em 0.0em;
+  position: relative;
 }
 
 ul.paginator>li>a:not(.chosen) {
@@ -156,7 +157,7 @@ ul.paginator>li:last-child>a {
 
 ul.paginator>li>a.inactive {
   color: rgba(255,255,255, 0.0);
-  visibility: hidden;
+  visibility: hdden;
   cursor: default;
 }
 
@@ -190,6 +191,8 @@ article section {
   padding: 1em 0.5em;
   margin: 5px 0px;
   border-radius: 2px;
+  position: relative;
+  box-shadow: 0px 1px 6px rgba(0,0,0,0.5);
 }
 
 article p {
@@ -202,6 +205,11 @@ article header {
   text-align: center;
   font-weight: normal;
   font-size: 1.5em;
+}
+
+article textarea {
+  width: 100%;
+  min-height: 20em;
 }
 
 section.samples table {
@@ -221,6 +229,18 @@ section.samples table td pre {
   overflow: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+table.windows td:nth-child(2) {
+  width: 14em;
+}
+
+table.windows td:nth-child(3) {
+  width: 10em;
+}
+
+section.samples td {
+  width: 33.33%;
 }
 
 table {
@@ -288,15 +308,21 @@ table td {
 
 img.flag {
   vertical-align: middle;
-  margin: 0.25em 0.5em;
-  height: 16px;
+  margin: 0.0em 0.5em;
+  max-height: 24px;
   width: 32px;
 }
 
 th.problem {
   text-overflow: hidden;
   text-align: center;
+  position: relative;
   width: 4em;
+}
+
+table.scoreboard tr.ineligible {
+  font-style: italic;
+  opacity: 0.5;
 }
 
 table.scoreboard td.correct, table.scoreboard td.wrong, table.scoreboard td.unsolved, table.scoreboard td.attempts, table.scoreboard td.judging {
@@ -317,7 +343,15 @@ table.scoreboard td.correct {
   background:     -ms-linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
   background:    -moz-linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
   background: -webkit-linear-gradient(left, transparent 15%, lightgreen 15%, lightgreen 85%, transparent 85%);
+}
 
+table.scoreboard td.correct.first-solver {
+  color: white;
+
+  background:         linear-gradient(left, transparent 15%, green 15%, green 85%, transparent 85%);
+  background:     -ms-linear-gradient(left, transparent 15%, green 15%, green 85%, transparent 85%);
+  background:    -moz-linear-gradient(left, transparent 15%, green 15%, green 85%, transparent 85%);
+  background: -webkit-linear-gradient(left, transparent 15%, green 15%, green 85%, transparent 85%);
 }
 
 table.scoreboard td.wrong {
@@ -341,6 +375,9 @@ table.scoreboard td .problem_penalty {
 table.scoreboard a {
   color: inherit;
   text-decoration: none;
+  display: block;
+  height: 100%;
+  width: 100%;
 }
 
 section.samples table {
@@ -410,22 +447,63 @@ input[type="radio"]:checked+label {
 
 code pre {
   padding: 1em;
-  font-size: 8pt;
+  font-size: 10pt;
   font-family: "Consolas", "Liberation Mono", Monospace;
   border: 1px solid rgb(180,180,180);
   background: rgb(230,230,230);
 }
 
-.samples tr.correct td {
-  background: lightgreen;
+.samples tr td {
+  position: relative;
 }
 
-.samples tr.incorrect td {
-  background: lightred;
+.samples tr.pending:after {
+  content: '?';
+  color: grey;
+  font-size: 200%;
+  position: absolute;
+  right: 0.25em;
+  top: 0.25em;
 }
 
-.samples tr.judging td {
-  background: blue;
+.samples tr.correct:after {
+  content: '✓';
+  color: green;
+  font-size: 200%;
+  position: absolute;
+  right: 0.25em;
+  top: 0.25em;
+}
+
+.samples tr.incorrect:after {
+  content: '✗';
+  color: blue;
+  font-size: 200%;
+  position: absolute;
+  right: 0.25em;
+  top: 0.25em;
+}
+
+.samples tr.timelimit:after {
+  content: '⏱';
+  color: blue;
+  font-size: 200%;
+  position: absolute;
+  right: 0.25em;
+  top: 0.25em;
+}
+
+.samples tr.runtime-error:after {
+  content: '⚠';
+  color: blue;
+  font-size: 200%;
+  position: absolute;
+  right: 0.25em;
+  top: 0.25em;
+}
+
+.samples tr.judging {
+  opacity: 0.5;
 }
 
 meter {

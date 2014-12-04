@@ -1,0 +1,24 @@
+: include "headers/contest.tx"
+
+<article class="problem">
+  <section class="statement">
+    <form>
+      <header>
+        <: $problem.id :> / <input value="<: $problem.shortname :>" /> - <input value="<: $problem.name :>" />
+      </header>
+      <textarea id="problem-statement"><: $statement :></textarea>
+      <div style="text-align: right;"><input type="submit" value="Save" /></div>
+    </form>
+  </section>
+</article>
+
+<!--
+<script type="text/javascript">
+//  var content = document.getElementById('epiceditor').innerHTML;
+//  var editor = new EpicEditor();
+//  editor.load();
+//  editor.importFile('problem-<: $problem.id :>', content);
+</script>
+-->
+
+: include "footers/contest.tx"

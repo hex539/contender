@@ -8,7 +8,6 @@ $(function(){
   var ival = null;
 
   ival = window.setInterval(function() {
-
     var now = new Date();
     var diff = now.getTime() - contest_start.getTime();
     var since = new Date(diff);

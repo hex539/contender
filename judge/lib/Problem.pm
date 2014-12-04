@@ -27,6 +27,8 @@ sub tests {
   my @results = ();
 
   opendir ((my $dir), dir($self, 'tests'));
+  return @results unless $dir;
+
   while (readdir $dir) {
     if ((my $name = $_) =~ /([a-zA-Z]+)(\d+)\.in/) {
       my $type = $1;

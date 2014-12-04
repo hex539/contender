@@ -17,6 +17,6 @@ paper-button[raisedButton].coloured::shadow #ripple {
   color: #2a56c6;
 }
 
-paper-button[raisedButton].coloured #focusBg,
-paper-button[raisedButton].coloured::shadow #focusBg {
+paper-toggle-button::shadow paper-radio-button::shadow #onRadio {
+  background: transparent;
 }

@@ -6,8 +6,20 @@ use feature 'state';
 
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(judgeroot);
+our @EXPORT = qw(judgeroot hashids);
 
-sub judgeroot {'/home/judge/data'}
+use Hashids;
+
+sub judgeroot {
+  '/home/judge/data'
+}
+
+sub hashids {
+  state $hsh = Hashids->new(
+    salt => 'default salt',
+    minHashLength => 5,
+  );
+  return $hsh;
+}
 
 1;

@@ -1,0 +1,26 @@
+* {
+  box-shadow: none !important;
+}
+
+body {
+  background: none !important;
+}
+
+div#topbar, div#widgets, div#page>ul.sublinks {
+  display: none;
+}
+
+div#content {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+}
+
+img#statement-banner, .ineligible {
+  display: none;
+}
+
+td.first-solver {
+  color: black !important;
+}

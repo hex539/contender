@@ -1,0 +1,53 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title><: $title :></title>
+    <script src="/static/scripts/external/polymer-platform.js"></script>
+    <link rel="import" href="/static/polymer/core-toolbar/core-toolbar.html" />
+    <link rel="import" href="/static/polymer/paper-tabs/paper-tabs.html" />
+    <link rel="import" href="/static/polymer/paper-button/paper-button.html" />
+    <link rel="import" href="/static/polymer/paper-ripple/paper-ripple.html" />
+    <link rel="import" href="/static/polymer/core-tooltip/core-tooltip.html" />
+    <link rel="import" href="/static/polymer/paper-toggle-button/paper-toggle-button.html" />
+    <link href="/static/css/concept.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/paper.css" rel="stylesheet" type="text/css"/>
+    <link href="/static/css/print.css" rel="stylesheet" type="text/css" media="print" />
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    : if $start_time {
+    <script type="text/javascript">var contest_start = new Date(<: $start_time.epoch * 1000 :>), contest_duration = <: $duration :>;</script>
+    <script type="text/javascript" src="/static/scripts/countdown.js"></script>
+    : }
+    <script type="text/javascript" src="/static/scripts/external/epiceditor.js"></script>
+  </head>
+  <body>
+    <div id="topbar">
+      <header style="text-align: center">
+        <a href="/series/bath14">
+          <img src="/static/images/host.png" />
+        </a>
+      </header>
+      <div id="userbox">
+      : if $user {
+        Signed in as <span class="user"><: $user.realname || $user.username :></span> | <a href="?signout=1">Sign out</a>
+      : } else {
+        <a href="?signin=1">Sign in</a>
+      : }
+      </div>
+      <nav>
+        <ul class="toplinks">
+          : for $tabs -> $row {
+            <li><a href="<: $row.href :>"<: if $row.name == $tab { :> class="chosen"<: } :>><:
+              $row.name
+            :></a></li>
+          : }
+        </ul>
+      </nav>
+    </div>
+    <div id="page">
+      <ul class="sublinks paginator">
+      : for $subtabs -> $row {
+        <li><a href="<: $row.href :>"<: if $row.name == $subtab { :> class="chosen"<: } :>><: $row.name :><paper-ripple fit style="color:rgb(160,160,160)"></paper-ripple></a></li>
+      : }
+      </ul>

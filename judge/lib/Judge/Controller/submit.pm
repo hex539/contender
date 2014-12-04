@@ -4,6 +4,8 @@ use namespace::autoclean;
 
 use Database;
 use User;
+use File::Basename;
+use File::Spec::Functions;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }

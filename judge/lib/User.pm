@@ -54,7 +54,9 @@ sub get {
     return undef;
   }
 
-  return db->resultset('users')->find_or_create({username => $c->session->{username}});
+  return db->resultset('users')->find_or_create({
+    username => $c->session->{username} . '@bath.ac.uk',
+  });
 }
 
 sub force {

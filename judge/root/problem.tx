@@ -2,17 +2,24 @@
 
 <article class="problem">
   <section class="statement">
-    <paper-shadow z="1" />
     <header>
       <: $problem.shortname :> - <: $problem.name :>
+      : if $user && $user.administrator {
+      id=<: $problem.id :>
+      : }
     </header>
+    <div style="position: absolute; top: 2pt; right: 2pt">
+      <a href="<: $problem.shortname :>/writeup"><paper-toggle-button checked></paper-toggle-button></a>
+    </div>
     <div id="problem-statement">
       <: $statement :>
     </div>
+    <!--
     <div style="text-align: right;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>"><paper-button raisedButton class="coloured" label="submit solution"></paper-button></a></div>
+    -->
+    <div style="text-align: right;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>">Submit solution</a></div>
   </section>
   <section class="samples">
-    <paper-shadow z="1" />
     <header>
       Sample tests<!-- <a href="/contest/<: $contest.id :>/samples/<: $problem.shortname :>.tar.gz">download</a> -->
     </header>

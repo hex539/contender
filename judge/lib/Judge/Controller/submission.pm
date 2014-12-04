@@ -8,6 +8,7 @@ use File::Spec::Functions;
 use HTML::Defang;
 use HTML::Entities;
 use Problem;
+use Settings;
 use Text::Xslate qw(mark_raw);
 use User;
 use feature 'state';
@@ -49,6 +50,8 @@ sub submission
   my ($self, $c, $submission_id) = @_;
   my $user = User::force($c);
 
+  $submission_id = hashids->decrypt($submission_id);
+
   my $submission = db->resultset('submissions')->search({
     contest_id => $c->stash->{contest}->id,
     'me.id' => $submission_id,
@@ -58,14 +61,21 @@ sub submission
 
   return if not $submission;
   return if not $user->administrator and $user->id != $submission->user_id->id;
+  my $id = $submission->id;
 
   my $source = '';
+  my $compiler_output = '';
 
   eval {
-    my $id = $submission->id;
-    my $fno = `ls $judgeroot/submissions/$id/`;
-    chomp $fno;
-    $source = read_file("$judgeroot/submissions/$id/$fno");
+    $compiler_output = read_file("$judgeroot/submissions/$id/compile.log") || '';
+    $compiler_output =~ s/^\s+\n//g;
+    $compiler_output =~ s/\s+$//g;
+  };
+
+  eval {
+    my $fname = `ls $judgeroot/submissions/$id/ | fgrep -v .log`;
+    $fname =~ s/\s//g;
+    $source = read_file("$judgeroot/submissions/$id/$fname");
     $source =~ s/^\s+\n//g;
     $source =~ s/\s+$//g;
 
@@ -76,7 +86,7 @@ sub submission
        "\t" => "  ",
     };
 
-    (my $ext = $fno) =~ s/^.*\.//g;
+    (my $ext = $fname) =~ s/^.*\.//g;
     my $hl = undef;
 
     if ($ext eq 'py' or $ext eq 'pypy' or $ext eq 'python') {
@@ -105,15 +115,24 @@ sub submission
   push @test_types, 'full' if User::get($c) and User::get($c)->administrator;
   my $tests = Problem::tests($submission->problem_id, @test_types);
 
+  my %verdicts = map {$_->testcase => $_->status} db->resultset('judgements')->search({
+    submission_id => $submission_id,
+  })->all;
+
   for my $test (@$tests) {
     $test->{received} = '';
     eval {
       $test->{received} = read_file(catfile($judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.out'));
     };
+    $test->{stderr} = '';
+    eval {
+      $test->{stderr} = read_file(catfile($judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.err'));
+    };
 
     $test->{input} = substr $test->{input}, 0, 2048;
     $test->{output} = substr $test->{output}, 0, 2048;
     $test->{received} = substr $test->{received}, 0, 2048;
+    $test->{status} = $verdicts{$test->{type} . $test->{id}} // 'WAITING';
   }
 
   $c->stash(
@@ -124,6 +143,7 @@ sub submission
 
     submission => $submission,
     source => mark_raw($source),
+    compiler_log => $compiler_output,
     tests => $tests,
   );
 }

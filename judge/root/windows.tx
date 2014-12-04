@@ -19,32 +19,34 @@
       <li><a href="/contest/<: $contest.id :>/windows/page/<: ($page + 1) min $pagecount :>" class="<: $page == $pagecount? 'inactive': '' :>">&rarr;</a></li>
     </ul>
     : }
+  </section>
+  : for ['Running', 'Finished'] -> $status {
+  : if $windows[$status].size() > 0 {
+  <section>
+    <header>
+      <: $status :>
+    </header>
     <table class="windows">
       <thead>
         <tr>
           <th>Name</th>
           <th>Start</th>
           <th>Progress</th>
-          <th>State</th>
         </tr>
       </thead>
       <tbody>
-        : for $windows -> $row {
+        : for $windows[$status] -> $row {
         <tr>
           <td><img class="flag" src="/static/images/flags/uk-small.png"/><: $row.user_id.realname || $row.user_id.username:></td>
           <td><: $row.start_time.ymd :> <: $row.start_time.hms :></td>
-          <td><meter value="<: $now.epoch - $row.start_time.epoch - 60 * 60 :>" min="0" max="<: $row.duration :>" title="<: round(($now.epoch - $row.start_time.epoch - 60 * 60) * 100 / ($row.duration max 1)) min 100 :>%"></meter></td>
-          : if $now.epoch - $row.start_time.epoch - 60 * 60 <= $row.duration {
-          <td class="running">Running</td>
-          : } else {
-          <td class="finished">Finished</td>
-          : }
+          <td><meter value="<: $now.epoch - $row.start_time.epoch :>" min="0" max="<: $row.duration :>" title="<: round(($now.epoch - $row.start_time.epoch - 60 * 60) * 100 / ($row.duration max 1)) min 100 :>%"></meter></td>
         </tr>
         : }
       </tbody>
     </table>
-    <paper-shadow z-id="1" />
   </section>
+  : }
+  : }
 </article>
 
 : include "footers/contest.tx"
