@@ -1,0 +1,4 @@
+/executioner/gaols
+/judge/root/static/polymer
+*.log
+nohup.out
