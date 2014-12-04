@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Slurp qw(read_file);
+
+my @lines = <STDIN>;
+my $str = " @lines ";
+
+# Collapse whitespace
+$str =~ s/\s+/ /g;
+
+# Remove anything inside brackets
+$str =~ s/(\{(?:(?1)|[^{}]*+)++\})//g;
+
+my $res = 'Main';
+for my $match ($str =~ /\bpublic class ([a-zA-Z0-9]+)\b/g) {
+  last if (($res = $match) eq 'Main');
+}
+
+print "$res\n";
