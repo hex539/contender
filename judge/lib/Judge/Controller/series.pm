@@ -33,7 +33,7 @@ sub series
     if ($contest->start_time->epoch > $c->stash->{now}->epoch) {
       push $contests->{Upcoming}, $contest;
     }
-    elsif ($contest->start_time->epoch + $contest->duration > $c->stash->{now}->epoch) {
+    elsif (not defined $contest->duration || $contest->start_time->epoch + $contest->duration > $c->stash->{now}->epoch) {
       push $contests->{Running}, $contest;
     }
     else {

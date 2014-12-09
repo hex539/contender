@@ -91,7 +91,7 @@ sub index
 
   my $now = DateTime->now(time_zone => 'Europe/London');
   my $since_start = $now->epoch - $contest->start_time->epoch;
-  my $until_end   = $contest->duration - $since_start;
+  my $until_end   = ($contest->duration // $since_start) - $since_start;
   my $time_elapsed = sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0]);
   my $nice_duration = sprintf('%02d:%02d:%02d', (gmtime $contest->duration)[2,1,0]);
   my $start_time = $contest->start_time;
@@ -100,11 +100,12 @@ sub index
   $c->stash(
     user => User::get($c),
     contest => $contest,
+    series => $contest->series_id,
     since_start => $since_start,
     until_end => $until_end,
     duration => $duration,
     contest_status => (
-      $until_end >= 0? 'Running': 'Finished',
+      ($until_end >= 0 or not defined $contest->duration)? 'Running': 'Finished',
     ),
     now => $now,
     hashids => hashids,
@@ -187,7 +188,7 @@ sub index
     ],
 
     widgets => [
-      {
+      (defined $contest->duration) && {
         id => 'small_contest_state',
         title => 'Contest state',
         text => mark_raw(<<HTML . ($since_start >= 0 and $until_end >= 0? <<HTML: '')),
