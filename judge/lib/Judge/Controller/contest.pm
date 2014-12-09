@@ -180,11 +180,10 @@ sub index
         name => "Submit",
         href => "/contest/$id/submit",
       },
-      ($contest->windowed and User::get($c) and User::get($c)->administrator) &&
-        {
-          name => "Windows",
-          href => "/contest/$id/windows",
-        },
+      ($contest->windowed and User::get($c) and User::get($c)->administrator) && {
+        name => "Windows",
+        href => "/contest/$id/windows",
+      } || (),
     ],
 
     widgets => [
@@ -198,7 +197,7 @@ HTML
 <header>Duration</header>
 <span class="countdown">$nice_duration</span>
 HTML
-      },
+      } || (),
       {
         id => 'small_problem_set',
         title => 'Problem set',
