@@ -13,7 +13,9 @@
         <tr>
           <th>Name</th>
           <th class="points">Score</th>
+          : if defined($contest.duration) {
           <th class="penalty">Time</th>
+          : }
           : for $problems -> $problem {
           <th class="problem"><a href="/contest/<: $contest.id :>/problem/<: $problem.shortname :>" title="<: $problem.name :>"><:
             $problem.shortname
@@ -33,7 +35,9 @@
                 '/static/images/flags/uk-small.png'
             }:>"/><: $row.user.realname || $row.user.username :></td>
           <td class="points score"><: $row.score :></td>
+          : if defined($contest.duration) {
           <td class="penalty score"><: $row.penalty :></td>
+          : }
           : for $problems -> $problem {
           <td class="<: if $row[$problem.id].when {
                           'correct';
@@ -54,7 +58,9 @@
                 if $row[$problem.id].attempts > 0 { $row[$problem.id].attempts }
               }
               if $row[$problem.id].when {
-                :><span class="problem_penalty"><: if $row[$problem.id].penalty >= 0 { $row[$problem.id].penalty }:></span><:
+                if defined($contest.duration) {
+                  :><span class="problem_penalty"><: if $row[$problem.id].penalty >= 0 { $row[$problem.id].penalty }:></span><:
+                }
                 :></a><:
               }
             }
@@ -62,7 +68,7 @@
           : }
         </tr>
         : }
-        <tr><td colspan="3"></td>
+        <tr><td colspan="<: 2 + defined($contest.duration) :>"></td>
         : for $problems -> $prob {
         <td class="attempts"><: if $attempts[$prob.id] { $attempts[$prob.id].solved :>/<: $attempts[$prob.id].attempts } :></td>
         : }
