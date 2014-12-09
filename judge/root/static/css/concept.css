@@ -231,12 +231,25 @@ section.samples table td pre {
   word-wrap: break-word;
 }
 
-table.windows td:nth-child(2) {
+table.windows td:nth-child(2),
+table.contests td:nth-child(2) {
   width: 14em;
 }
 
-table.windows td:nth-child(3) {
+table.windows td:nth-child(3),
+table.contests td:nth-child(3) {
   width: 10em;
+}
+
+table.contests tr td:nth-child(1):before {
+  content: '\01f512' ; /* closed lock symbol */
+  display: inline-block;
+  opacity: 0.5;
+  width: 1.5em;
+}
+
+table.contests tr.openbook td:nth-child(1):before {
+  content: '\01f513' ; /* open lock symbol */
 }
 
 section.samples td {
@@ -309,8 +322,8 @@ table td {
 img.flag {
   vertical-align: middle;
   margin: 0.0em 0.5em;
-  max-height: 24px;
   width: 32px;
+  max-height: 16px;
 }
 
 th.problem {
