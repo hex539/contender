@@ -26,7 +26,7 @@ sub series
       Running  => [],
       Finished => [],
   };
-  for my $contest ($series->get_contests) {
+  for my $contest ($series->get_contests->search({}, {order_by => { -desc => [qw[start_time name]]}})->all) {
     unless ($contest->visible) {
       next unless ($c->stash->{user} && $c->stash->{user}->administrator);
     }
