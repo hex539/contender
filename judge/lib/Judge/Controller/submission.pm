@@ -46,7 +46,11 @@ sub submission
   :Args() {
 
   my ($self, $c, $submission_id) = @_;
-  my $user = User::force($c);
+
+  my $user = User::get($c);
+  if (not $c->stash->{contest}->openbook) {
+    $user //= User::force($c);
+  }
 
   $submission_id = hashids->decrypt($submission_id);
 
@@ -57,8 +61,8 @@ sub submission
     join => 'problem_id',
   })->next;
 
-  return if not $submission;
-  return if not $user->administrator and $user->id != $submission->user_id->id;
+  return $c->detach('/default') if not $submission;
+  return $c->detach('/default') if not $c->stash->{contest}->openbook and (not defined $user || $user->id != $submission->user_id->id && not $user->administrator);
   my $id = $submission->id;
 
   my $source = '';

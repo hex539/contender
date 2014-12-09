@@ -23,16 +23,28 @@ sub submissions
     order_by => {'-desc' => 'time'},
   });
 
-  if ($c->stash->{contest}->windowed) {
-    $user = User::force($c);
-
-    if (not $user->administrator) {
-      $results = $results->search({user_id => $user->id});
+  my $filter_user = $args{user} // undef;
+  if (defined $filter_user) {
+    my $usr = db->resultset('users')->find({username => $filter_user});
+    if (defined $usr) {
+      $filter_user = $usr->id;
     }
   }
+  if ($c->stash->{contest}->windowed) {
+    $user = User::force($c);
+    if (not $user->administrator) {
+      $filter_user = $user->id;
+    }
+  }
+  if (defined $filter_user) {
+    $results = $results->search({user_id => $filter_user});
+  }
 
-  if (exists $args{user}) {
-    $results = $results->search({user_id => int($args{user})});
+  if (exists $args{problem}) {
+    my $problem = db->resultset('problems')->find({contest_id => $contest_id, shortname => $args{problem}});
+    if (defined $problem) {
+      $results = $results->search({problem_id => $problem->id});
+    }
   }
 
   my $ipp = 20;
