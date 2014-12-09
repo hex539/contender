@@ -14,7 +14,7 @@
     <header>
       <: $status :>
     </header>
-    <table class="windows">
+    <table class="contests">
       <thead>
         <tr>
           <th>Name</th>
@@ -24,10 +24,14 @@
       </thead>
       <tbody>
         : for $contests[$status] -> $row {
-        <tr>
-          <td><a href="/contest/<: $row.id :>/problems"><: $row.name :></a></td>
+        <tr<: if $row.openbook { :> class="openbook"<: } :>>
+          <td><a href="/contest/<: $row.id :>/standings"><: $row.name :></a></td>
           <td><: $row.start_time.ymd :> <: $row.start_time.hms :></td>
-          <td><meter value="<: $now.epoch - $row.start_time.epoch :>" min="0" max="<: $row.duration :>" title="<: round(($now.epoch - $row.start_time.epoch - 60 * 60) * 100 / ($row.duration max 1)) min 100 :>%"></meter></td>
+          <td><: if not defined($row.duration) {
+            :>&mdash;<:
+          } else {
+            :><meter value="<: $now.epoch - $row.start_time.epoch :>" min="0" max="<: $row.duration :>" title="<: round(($now.epoch - $row.start_time.epoch - 60 * 60) * 100 / ($row.duration max 1)) min 100 :>%"></meter></td><:
+          } :>
         </tr>
         : }
       </tbody>
