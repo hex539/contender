@@ -5,10 +5,11 @@
     <title><: $title :></title>
     <script src="/static/scripts/external/polymer-platform.js"></script>
     <link rel="import" href="/static/polymer/core-toolbar/core-toolbar.html" />
-    <link rel="import" href="/static/polymer/paper-tabs/paper-tabs.html" />
-    <link rel="import" href="/static/polymer/paper-button/paper-button.html" />
-    <link rel="import" href="/static/polymer/paper-ripple/paper-ripple.html" />
     <link rel="import" href="/static/polymer/core-tooltip/core-tooltip.html" />
+    <link rel="import" href="/static/polymer/paper-button/paper-button.html" />
+    <link rel="import" href="/static/polymer/paper-fab/paper-fab.html" />
+    <link rel="import" href="/static/polymer/paper-ripple/paper-ripple.html" />
+    <link rel="import" href="/static/polymer/paper-tabs/paper-tabs.html" />
     <link rel="import" href="/static/polymer/paper-toggle-button/paper-toggle-button.html" />
     <link href="/static/css/concept.css" rel="stylesheet" type="text/css"/>
     <link href="/static/css/paper.css" rel="stylesheet" type="text/css"/>
@@ -19,7 +20,8 @@
     <script type="text/javascript">var contest_start = new Date(<: $start_time.epoch * 1000 :>), contest_duration = <: $duration :>;</script>
     <script type="text/javascript" src="/static/scripts/countdown.js"></script>
     : }
-    <script type="text/javascript" src="/static/scripts/external/epiceditor.js"></script>
+    <!-- <script type="text/javascript" src="/static/scripts/external/epiceditor.js"></script> -->
+    <script src="https://apis.google.com/js/client:platform.js" async defer></script>
   </head>
   <body>
     <div id="topbar">

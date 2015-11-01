@@ -8,38 +8,58 @@
       id=<: $problem.id :>
       : }
     </header>
+    <!--
     <div style="position: absolute; top: 2pt; right: 2pt">
-      <a href="<: $problem.shortname :>/writeup"><paper-toggle-button checked></paper-toggle-button></a>
+      <a href="<: $problem.shortname :>/writeup"><paper-toggle-button checked>Writeup</paper-toggle-button></a>
     </div>
+    -->
     <div id="problem-statement">
       <: $statement :>
     </div>
-    <!--
-    <div style="text-align: right;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>"><paper-button raisedButton class="coloured" label="submit solution"></paper-button></a></div>
-    -->
-    <div style="text-align: right;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>">Submit solution</a></div>
+    : if !defined($contest_status) || $contest_status == 'Running' {
+    <div style="text-align: right;"><a href="/contest/<: $contest.id :>/submit/<: $problem.shortname :>"><paper-fab title="submit solution" role="button" icon="file-upload">Submit solution</paper-fab></a></div>
+    : }
   </section>
+
   <section class="samples">
     <header>
-      Sample tests<!-- <a href="/contest/<: $contest.id :>/samples/<: $problem.shortname :>.tar.gz">download</a> -->
+      Sample tests
     </header>
-    <table>
+    <table class="samples">
       <thead>
         <tr>
           <th>Input</th>
           <th>Output</th>
         </tr>
       </thead>
+    </table>
+  </section>
+  : for $samples -> $sample {
+  <section class="samples">
+    <table>
       <tbody>
-      : for $samples -> $sample {
         <tr>
           <td class="input" ><pre><: $sample.input :></pre></td>
           <td class="output"><pre><: $sample.output :></pre></td>
         </tr>
-      : }
       </tbody>
     </table>
   </section>
+  : }
+  <!--
+  <section>
+    <span id="signinButton">
+      <span
+        class="g-signin"
+        data-callback="signinCallback"
+        data-clientid="418047662949-s8aa80s89i4oe0vmtdoigqncvqaq3sp3.apps.googleusercontent.com"
+        data-cookiepolicy="single_host_origin"
+        data-requestvisibleactions="http://schema.org/AddAction"
+        data-scope="https://www.googleapis.com/auth/plus.login">
+      </span>
+    </span>
+  </section>
+  -->
 </article>
 
 : include "footers/contest.tx"
