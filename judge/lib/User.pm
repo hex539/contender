@@ -14,8 +14,11 @@ use URI::Escape;
 use Database;
 use AuthCAS;
 
-my $cas = new AuthCAS(casUrl => 'https://auth.bath.ac.uk',
-                      CAFile => '/home/hex539/sso-cert.pem');
+sub new_bath_cas {
+  state $cas = new AuthCAS(casUrl => 'https://auth.bath.ac.uk',
+                           CAFile => '/home/hex539/sso-cert.pem');
+  return $cas;
+}
 
 sub canon_url {
   my ($c) = @_;
@@ -38,7 +41,7 @@ sub get {
   }
 
   if (defined $c->request->params->{ticket}) {
-    if (my $user = $cas->validateST(canon_url($c), $c->request->params->{ticket})) {
+    if (my $user = new_bath_cas->validateST(canon_url($c), $c->request->params->{ticket})) {
       $c->session->{username} = $user;
       $c->session_expire_key(username => 36000);
     }
@@ -66,7 +69,7 @@ sub force {
     return $result;
   }
 
-  $c->response->redirect($cas->getServerLoginURL(canon_url($c)));
+  $c->response->redirect(new_bath_cas->getServerLoginURL(canon_url($c)));
   $c->detach;
 }
 
