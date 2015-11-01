@@ -40,6 +40,40 @@ sub format_table {
   }
 }
 
+sub highlighter {
+  @_ == 1 or die;
+  my $ext = shift;
+
+  state $substitutions = {
+   "<" => "&lt;",
+   ">" => "&gt;",
+   "&" => "&amp;",
+   "\t" => "  ",
+  };
+  my @hl_args = (substitutions => $substitutions, format_table => format_table);
+
+  my $hl = undef;
+  eval {
+    if ($ext eq 'py' or $ext eq 'pypy' or $ext eq 'python') {
+      use Syntax::Highlight::Engine::Kate::Python;
+      $hl = new Syntax::Highlight::Engine::Kate::Python(@hl_args);
+    }
+    elsif ($ext eq 'cc' or $ext eq 'c' or $ext eq 'cpp' or $ext eq 'cxx') {
+      use Syntax::Highlight::Engine::Kate::Cplusplus;
+      $hl = new Syntax::Highlight::Engine::Kate::Cplusplus(@hl_args);
+    }
+    elsif ($ext eq 'java') {
+      use Syntax::Highlight::Engine::Kate::Java;
+      $hl = new Syntax::Highlight::Engine::Kate::Java(@hl_args);
+    }
+    elsif ($ext eq 'matlab' or $ext eq 'm' or $ext eq 'octave') {
+      use Syntax::Highlight::Engine::Kate::Matlab;
+      $hl = new Syntax::Highlight::Engine::Kate::Matlab(@hl_args);
+    }
+  };
+  return $hl;
+}
+
 sub submission
   :Chained("/contest/index")
   :PathPart("submission")
@@ -82,40 +116,19 @@ sub submission
     $source =~ s/^\s+\n//g;
     $source =~ s/\s+$//g;
 
-    state $substitutions = {
-       "<" => "&lt;",
-       ">" => "&gt;",
-       "&" => "&amp;",
-       "\t" => "  ",
-    };
-
     (my $ext = $fname) =~ s/^.*\.//g;
-    my $hl = undef;
-
-    if ($ext eq 'py' or $ext eq 'pypy' or $ext eq 'python') {
-      use Syntax::Highlight::Engine::Kate::Python;
-      $hl = new Syntax::Highlight::Engine::Kate::Python(substitutions => $substitutions, format_table => format_table);
+    if (my $hl = highlighter($ext)) {
+      $source = $hl->highlightText($source);
     }
-    elsif ($ext eq 'cc' or $ext eq 'c' or $ext eq 'cpp' or $ext eq 'cxx') {
-      use Syntax::Highlight::Engine::Kate::Cplusplus;
-      $hl = new Syntax::Highlight::Engine::Kate::Cplusplus(substitutions => $substitutions, format_table => format_table);
-    }
-    elsif ($ext eq 'java') {
-      use Syntax::Highlight::Engine::Kate::Java;
-      $hl = new Syntax::Highlight::Engine::Kate::Java(substitutions => $substitutions, format_table => format_table);
-    }
-    elsif ($ext eq 'matlab' or $ext eq 'm' or $ext eq 'octave') {
-      use Syntax::Highlight::Engine::Kate::Matlab;
-      $hl = new Syntax::Highlight::Engine::Kate::Matlab(substitutions => $substitutions, format_table => format_table);
-    }
-
-    $source = $hl->highlightText($source) if $hl;
   };
 
   $source = HTML::Defang->new(fix_mismatched_tags => 1)->defang($source);
 
   my @test_types = ('sample');
-  push @test_types, 'full' if User::get($c) and User::get($c)->administrator;
+  if ($c->stash->{contest}->openbook || User::get($c) && User::get($c)->administrator) {
+    # Allow visibility of all test cases for open contests or signed-in administrators
+    push @test_types, 'full';
+  }
   my $tests = Problem::tests($submission->problem_id, @test_types);
 
   my %verdicts = map {$_->testcase => $_->status} db->resultset('judgements')->search({
