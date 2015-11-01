@@ -10,7 +10,7 @@
 
 body {
   overflow-y: scroll;
-  background: #f9f9f9;
+  background: #eeeeee;
 }
 
 html {
@@ -256,10 +256,6 @@ section.samples td {
   width: 33.33%;
 }
 
-table {
-  width: 100%;
-}
-
 div#widgets {
   display: block;
   margin: 0em 1em;
@@ -309,6 +305,20 @@ table {
   text-align: left;
   margin: 1em;
   width: calc(100% - 2em);
+}
+
+.statement table {
+  border: 1px solid black;
+  margin: auto auto;
+  width: auto;
+}
+
+.statement table th {
+  background: lightgrey;
+}
+
+.statement table tr>* {
+  padding: 1em 1em;
 }
 
 table th {
@@ -464,10 +474,6 @@ code pre {
   font-family: "Consolas", "Liberation Mono", Monospace;
   border: 1px solid rgb(180,180,180);
   background: rgb(230,230,230);
-}
-
-.samples tr td {
-  position: relative;
 }
 
 .samples tr.pending:after {

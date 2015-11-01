@@ -24,3 +24,7 @@ img#statement-banner, .ineligible {
 td.first-solver {
   color: black !important;
 }
+
+paper-fab {
+  display: none;
+}
