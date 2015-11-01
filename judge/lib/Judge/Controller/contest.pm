@@ -92,8 +92,8 @@ sub index
   my $now = DateTime->now(time_zone => 'Europe/London');
   my $since_start = $now->epoch - $contest->start_time->epoch;
   my $until_end   = ($contest->duration // $since_start) - $since_start;
-  my $time_elapsed = sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0]);
-  my $nice_duration = sprintf('%02d:%02d:%02d', (gmtime $contest->duration)[2,1,0]);
+  my $time_elapsed = (defined $since_start) && sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0]) || undef;
+  my $nice_duration = (defined $contest->duration) && sprintf('%02d:%02d:%02d', (gmtime $contest->duration)[2,1,0]) || undef;
   my $start_time = $contest->start_time;
   my $duration = $contest->duration;
 
