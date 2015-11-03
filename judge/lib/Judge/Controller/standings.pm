@@ -99,7 +99,7 @@ sub standings
         $attempts{$prob}->{first} = $solved{$user}->{$prob}->{penalty};
       }
     }
-    elsif ($sub->status ne 'JUDGING' and $sub->status ne 'WAITING') {
+    elsif ($sub->status ne 'JUDGING' and $sub->status ne 'WAITING' and $sub->status ne 'COMPILE-ERROR') {
       $solved{$user}->{$prob}->{attempts}++;
     }
     else {
