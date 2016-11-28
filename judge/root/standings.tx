@@ -48,7 +48,7 @@
                      elsif $row[$problem.id].judging { 'judging' }
                      elsif $row[$problem.id].attempts { 'wrong' } :>"><:
             if $row[$problem.id] {
-              if $row[$problem.id].when {
+              if $row[$problem.id].when || $row[$problem.id].attempts {
                 '<a href="/contest/' ~ $contest.id ~ '/submission/' ~ $hashids.encrypt($row[$problem.id].id) ~ '">' | mark_raw
               }
               if $row[$problem.id].judging {
