@@ -316,55 +316,6 @@ __PACKAGE__->add_columns(
 );
 __PACKAGE__->set_primary_key('id');
 
-package Judge::ORM::event_log;
-use base 'DBIx::Class';
-use strict;
-use warnings;
-
-__PACKAGE__->load_components(qw/ Core InflateColumn::DateTime/);
-__PACKAGE__->table('event_log');
-
-__PACKAGE__->add_columns(
-  'id' => {
-    'data_type'         => 'int',
-    'is_auto_increment' => 1,
-    'default_value'     => undef,
-    'is_foreign_key'    => 0,
-    'name'              => 'id',
-    'is_nullable'       => 0,
-    'size'              => '11'
-  },
-  'contest_id' => {
-    'data_type'         => 'int',
-    'is_auto_increment' => 0,
-    'default_value'     => 'NULL',
-    'is_foreign_key'    => 1,
-    'name'              => 'contest_id',
-    'is_nullable'       => 1,
-    'size'              => '11'
-  },
-  'time' => {
-    'data_type'         => 'TIMESTAMP',
-    'is_auto_increment' => 0,
-    'default_value'     => \'CURRENT_TIMESTAMP',
-    'timezone'          => 'UTC',
-    'is_foreign_key'    => 0,
-    'name'              => 'time',
-    'is_nullable'       => 1,
-    'size'              => '0'
-  },
-  'description' => {
-    'data_type'         => 'TEXT',
-    'is_auto_increment' => 0,
-    'default_value'     => undef,
-    'is_foreign_key'    => 0,
-    'name'              => 'description',
-    'is_nullable'       => 1,
-    'size'              => '65535'
-  },
-);
-__PACKAGE__->set_primary_key('id');
-
 package Judge::ORM::problems;
 use base 'DBIx::Class';
 use strict;
@@ -507,7 +458,6 @@ package Judge::ORM::contests;
 __PACKAGE__->belongs_to( 'series_id', 'Judge::ORM::series' );
 
 __PACKAGE__->has_many( 'get_problems',  'Judge::ORM::problems',  'contest_id' );
-__PACKAGE__->has_many( 'get_event_log', 'Judge::ORM::event_log', 'contest_id' );
 __PACKAGE__->has_many( 'get_windows',   'Judge::ORM::windows', 'contest_id' );
 
 package Judge::ORM::judgements;
@@ -527,10 +477,6 @@ package Judge::ORM::users;
 
 __PACKAGE__->has_many( 'get_submissions', 'Judge::ORM::submissions', 'user_id');
 __PACKAGE__->has_many( 'get_windows', 'Judge::ORM::windows', 'contest_id' );
-
-package Judge::ORM::event_log;
-
-__PACKAGE__->belongs_to( 'contest_id', 'Judge::ORM::contests' );
 
 package Judge::ORM::problems;
 
@@ -560,8 +506,6 @@ __PACKAGE__->register_class( 'judgements', 'Judge::ORM::judgements' );
 __PACKAGE__->register_class( 'submissions', 'Judge::ORM::submissions' );
 
 __PACKAGE__->register_class( 'users', 'Judge::ORM::users' );
-
-__PACKAGE__->register_class( 'event_log', 'Judge::ORM::event_log' );
 
 __PACKAGE__->register_class( 'problems', 'Judge::ORM::problems' );
 
