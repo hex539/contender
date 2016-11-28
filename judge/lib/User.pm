@@ -10,13 +10,15 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(get force);
 
-use URI::Escape;
-use Database;
 use AuthCAS;
+use URI::Escape;
+
+use Database;
+use Settings qw(judge_config);
 
 sub new_bath_cas {
-  state $cas = new AuthCAS(casUrl => 'https://auth.bath.ac.uk',
-                           CAFile => '/home/hex539/sso-cert.pem');
+  state $cas = new AuthCAS(casUrl => judge_config->{authentication}->{cas_url} // die,
+                           CAFile => judge_config->{authentication}->{cas_cert} // die);
   return $cas;
 }
 
@@ -29,8 +31,10 @@ sub canon_url {
 }
 
 sub get {
+  @ >= 1 or die 'Wrong number of arguments';
   my ($c, %args) = @_;
 
+  $c // die 'No context';
   $c->session_expires;
 
   if (exists $c->request->params->{signout}) {
