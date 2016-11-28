@@ -31,13 +31,13 @@ sub series
       next unless ($c->stash->{user} && $c->stash->{user}->administrator);
     }
     if ($contest->start_time->epoch > $c->stash->{now}->epoch) {
-      push $contests->{Upcoming}, $contest;
+      push @{$contests->{Upcoming}}, $contest;
     }
     elsif ((not defined $contest->duration) || $contest->start_time->epoch + $contest->duration > $c->stash->{now}->epoch) {
-      push $contests->{Running}, $contest;
+      push @{$contests->{Running}}, $contest;
     }
     else {
-      push $contests->{Finished}, $contest;
+      push @{$contests->{Finished}}, $contest;
     }
   }
 
