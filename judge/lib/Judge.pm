@@ -2,7 +2,7 @@ package Judge;
 use Moose;
 use namespace::autoclean;
 
-use Catalyst::Runtime 5.80;
+use Catalyst::Runtime;
 
 # -Debug
 use Catalyst qw/
@@ -12,6 +12,7 @@ use Catalyst qw/
   Session
   Session::State::Cookie
   Session::Store::FastMmap
+  Unicode::Encoding
 /;
 
 extends 'Catalyst';
