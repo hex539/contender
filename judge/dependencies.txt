@@ -1,0 +1,13 @@
+AuthCAS
+Catalyst::Plugin::ConfigLoader
+Catalyst::Plugin::Redirect
+Catalyst::Plugin::Session::State::Cookie
+Catalyst::Plugin::Session::Store::FastMmap
+Catalyst::Plugin::Static::Simple
+Catalyst::ScriptRunner
+Catalyst::View::Xslate
+DateTime::Format::Pg
+Hashids
+HTML::Defang
+Syntax::Highlight::Engine::Kate::Python
+Text::Markdown
