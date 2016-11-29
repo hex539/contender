@@ -127,7 +127,7 @@ sub submission
   my @test_types = ('sample');
   if ($c->stash->{contest}->openbook || User::get($c) && User::get($c)->administrator) {
     # Allow visibility of all test cases for open contests or signed-in administrators
-    push @test_types, 'full';
+    push @test_types, 'secret';
   }
   my $tests = Problem::tests($submission->problem_id, @test_types);
 

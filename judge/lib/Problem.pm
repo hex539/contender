@@ -26,22 +26,32 @@ sub tests {
 
   my @results = ();
 
-  opendir ((my $dir), dir($self, 'tests'));
+  opendir ((my $dir), dir($self, 'data'));
   return @results unless $dir;
 
   while (readdir $dir) {
-    if ((my $name = $_) =~ /([a-zA-Z]+)(\d+)\.in/) {
-      my $type = $1;
-      my $num = $2;
-
+    if ((my $type = $_) =~ /^[a-zA-Z]+$/) {
       next if %types and not exists $types{$type};
 
-      push @results, {
-        type    => $type,
-        id      => int($num),
-        input   => scalar read_file(catfile(dir($self, 'tests'), "$type$num.in")),
-        output  => scalar read_file(catfile(dir($self, 'tests'), "$type$num.out")),
-      };
+      opendir ((my $typedir), dir($self, 'data', $type));
+      next unless $typedir;
+
+      while (readdir $typedir) {
+        if ((my $full_name = $_) =~ /(\d+)([a-zA-Z]*)\.in/) {
+          my $num = $1;
+          my $description = $2;
+
+          my $name = $full_name;
+          $name =~ s/\..+//g;
+
+          push @results, {
+            type    => $type,
+            id      => int($num),
+            input   => scalar read_file(catfile(dir($self, 'data', $type), "$name.in")),
+            output  => scalar read_file(catfile(dir($self, 'data', $type), "$name.ans")),
+          };
+        }
+      }
     }
   }
   closedir $dir;
