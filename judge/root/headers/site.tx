@@ -27,9 +27,13 @@
   <body>
     <div id="topbar">
       <header style="text-align: center">
-        <a href="/series/<: if $series {$series.shortname} else {'bath14'} :>">
+        : if $series {
+        <a href="/series/<: $series.shortname :>">
+        : }
           <img src="/static/images/host/<: if $series {$series.shortname} else {'default'} :>.png" />
+        : if $series {
         </a>
+        : }
       </header>
       <div id="userbox">
       : if $user {
