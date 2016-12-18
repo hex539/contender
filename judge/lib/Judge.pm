@@ -12,7 +12,6 @@ use Catalyst qw/
   Session
   Session::State::Cookie
   Session::Store::FastMmap
-  Unicode::Encoding
 /;
 
 extends 'Catalyst';
