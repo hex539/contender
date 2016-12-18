@@ -2,6 +2,7 @@ package Judge::Controller::submissions;
 use Moose;
 use namespace::autoclean;
 
+use Judge::Model::Submission;
 use Database;
 use User;
 use feature 'state';
@@ -17,46 +18,30 @@ sub submissions
 
   my $user = User::get($c);
 
-  my $contest_id = $c->stash->{contest}->id;
-  my $results = db->resultset('submissions')->search({contest_id => $contest_id}, {
-    join => 'problem_id',
-    order_by => {'-desc' => 'time'},
-  });
+  my $target_user = undef;
+  if (defined $args{user}) {
+    $target_user = User::find($args{user});
 
-  my $filter_user = $args{user} // undef;
-  if (defined $filter_user) {
-    my $usr = db->resultset('users')->find({username => $filter_user});
-    if (defined $usr) {
-      $filter_user = $usr->id;
-    }
-  }
-  if ($c->stash->{contest}->windowed) {
-    $user = User::force($c);
-    if (not $user->administrator) {
-      $filter_user = $user->id;
-    }
-  }
-  if (defined $filter_user) {
-    $results = $results->search({user_id => $filter_user});
+    # TODO redirect this to a nice neat 404 page.
+    defined $target_user or warn 'No such user';
   }
 
-  if (exists $args{problem}) {
-    my $problem = db->resultset('problems')->find({
-      contest_id => $contest_id,
-      shortname => $args{problem}
-    });
-    if (defined $problem) {
-      $results = $results->search({problem_id => $problem->id});
-    }
-  }
+  my $results = Judge::Model::Submission::list(
+    requester => $user,
+    contest_id => $args{contest_id},
+    problem => $args{problem},
+    user => $target_user,
+  );
 
+  # Pagination of results (TODO move this to a View)
   my $ipp = 20;
   my $pagecount = int(($ipp - 1 + $results->count) / $ipp) || 1;
-  $args{page} = int($args{page} || 1);
+  $args{page} = int($args{page} // 1);
   $args{page} = 1          if $args{page} < 1;
   $args{page} = $pagecount if $args{page} > $pagecount;
   my @submissions = $results->search({}, {rows => $ipp})->page($args{page})->all;
 
+  # Buttons for pagination (TODO move this to a View)
   my @pages = ($args{page});
   $pages[0]-- while 1 < $pages[0] and ($args{page} - $pages[0] < 2 or $pages[0] + 4 > $pagecount);
   push @pages, $pages[$#pages] + 1 while @pages < 5 and $pages[$#pages] < $pagecount;
