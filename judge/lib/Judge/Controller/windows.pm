@@ -2,9 +2,12 @@ package Judge::Controller::windows;
 use Moose;
 use namespace::autoclean;
 
+use strict;
+use warnings;
+use feature 'state';
+
 use Database;
 use User;
-use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
