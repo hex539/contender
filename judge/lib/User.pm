@@ -8,7 +8,7 @@ use feature 'state';
 use Exporter;
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(get force);
+our @EXPORT_OK = qw(get force find);
 
 use AuthCAS;
 use URI::Escape;
@@ -75,6 +75,14 @@ sub force {
 
   $c->response->redirect(new_bath_cas->getServerLoginURL(canon_url($c)));
   $c->detach;
+}
+
+sub find {
+  my $full_username = shift @_;
+
+  return db->resultset('users')->find({
+    username => $full_username,
+  });
 }
 
 1;
