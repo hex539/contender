@@ -41,7 +41,10 @@ sub submissions
   }
 
   if (exists $args{problem}) {
-    my $problem = db->resultset('problems')->find({contest_id => $contest_id, shortname => $args{problem}});
+    my $problem = db->resultset('problems')->find({
+      contest_id => $contest_id,
+      shortname => $args{problem}
+    });
     if (defined $problem) {
       $results = $results->search({problem_id => $problem->id});
     }
