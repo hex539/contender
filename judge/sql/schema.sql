@@ -38,7 +38,8 @@ CREATE TABLE "contests" (
   "duration"      interval        DEFAULT NULL,
   "visible"       boolean         NOT NULL,
   "openbook"      boolean         NOT NULL DEFAULT false,
-  "windowed"      boolean         NOT NULL DEFAULT false
+  "windowed"      boolean         NOT NULL DEFAULT false,
+  "penalty"       integer         NOT NULL DEFAULT 20
 );
 
 

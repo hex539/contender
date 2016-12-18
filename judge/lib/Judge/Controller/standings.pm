@@ -78,7 +78,7 @@ sub standings
     if ($sub->status eq 'OK') {
       $solved{$user}->{$prob}->{when} = $sub->time;
       $solved{$user}->{score}++;
-      $solved{$user}->{penalty} += $solved{$user}->{$prob}->{attempts} * 20;
+      $solved{$user}->{penalty} += $solved{$user}->{$prob}->{attempts} * $contest->{penalty};
       $solved{$user}->{$prob}->{penalty} =
         int((($sub->time->epoch)
           -(($c->stash->{contest}->windowed?
