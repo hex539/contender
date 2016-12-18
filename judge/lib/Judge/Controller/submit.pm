@@ -61,13 +61,13 @@ sub submit
     }
     $dbh->commit;
 
-    $c->response->redirect('http://contest.incoherency.co.uk/contest/' . $c->stash->{contest}->id . '/standings');
+    $c->response->redirect('https://hex539.me/contest/' . $c->stash->{contest}->id . '/standings');
     $c->detach;
     return;
   }
 
   my $problems = [];
-  
+
   if ($c->stash->{contest_status} eq 'Running') {
     $problems = [db->resultset('problems')->search({
       contest_id => $c->stash->{contest}->id,

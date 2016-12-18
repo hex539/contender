@@ -85,7 +85,7 @@ sub index
     $sth->execute($contest->id, $user->id, $duration);
     $dbh->commit;
 
-    $c->redirect('http://contest.incoherency.co.uk/contest/' . $contest->id . '/problems');
+    $c->redirect('https://hex539.me/contest/' . $contest->id . '/problems');
     $c->detach;
   }
 
