@@ -95,7 +95,8 @@ CREATE TABLE "submissions" (
 
 DROP TABLE IF EXISTS "judgements" CASCADE;
 CREATE TABLE "judgements" (
-  "id"            serial    NOT NULL PRIMARY KEY,
-  "submission_id" integer   NOT NULL REFERENCES "submissions" ("id") ON DELETE CASCADE,
-  "status"        verdict   NOT NULL DEFAULT 'WAITING'
+  "id"            serial        NOT NULL PRIMARY KEY,
+  "submission_id" integer       NOT NULL REFERENCES "submissions" ("id") ON DELETE CASCADE,
+  "status"        verdict       NOT NULL DEFAULT 'WAITING',
+  "testcase"      varchar(255)  NOT NULL UNIQUE
 );

@@ -204,7 +204,7 @@ __PACKAGE__->add_columns(
     'default_value'     => undef,
     'is_foreign_key'    => 0,
     'name'              => 'testcase',
-    'is_nullable'       => 1,
+    'is_nullable'       => 0,
     'size'              => '255'
   },
 );
