@@ -16,7 +16,7 @@ sub submissions
 
   my ($self, $c, %args) = @_;
 
-  my $user = User::get($c);
+  my $user = User::force($c);
 
   my $target_user = undef;
   if (defined $args{user}) {
