@@ -63,7 +63,7 @@ sub view
 
   $c->stash(
     statement => $statement,
-    samples => Problem::tests($problem, 'sample'),
+    samples => Judge::Model::Problem::tests($problem, 'sample'),
   );
 }
 
