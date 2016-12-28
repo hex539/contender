@@ -9,6 +9,7 @@ use base 'Catalyst::View::Xslate';
 __PACKAGE__->config(
   encoding => undef,
   template_extension => '.tx',
+  encode_body => 0
 );
 
 1;
