@@ -1,4 +1,6 @@
-package Problem;
+package Judge::Model::Problem;
+use Moose;
+use namespace::autoclean;
 
 use strict;
 use warnings;
@@ -11,6 +13,8 @@ use File::Slurp;
 use File::Spec::Functions;
 use HTML::Defang;
 use Text::Markdown qw(markdown);
+
+BEGIN {extends 'Catalyst::Model'; }
 
 use Settings qw(judgeroot);
 

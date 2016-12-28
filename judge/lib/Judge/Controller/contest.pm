@@ -5,7 +5,7 @@ use namespace::autoclean;
 use DateTime;
 use Database;
 use Settings;
-use User;
+use Judge::Model::User;
 use HTML::Entities;
 use feature 'state';
 
@@ -61,19 +61,19 @@ sub index
   $id = int($id);
 
   my $contest = db->resultset('contests')->find({id => $id});
-  $c->stash(user => User::get($c));
+  $c->stash(user => Judge::Model::User::get($c));
 
   if (not defined $contest) {
     $c->detach('/default');
   }
   if (not $contest->visible) {
-    $c->detach('/default') unless User::force($c)->administrator;
+    $c->detach('/default') unless Judge::Model::User::force($c)->administrator;
   }
 
   if (exists $c->request->body_parameters->{start_contest} and $contest->windowed) {
-#     User::force($c)->start_window($contest);
+#     Judge::Model::User::force($c)->start_window($contest);
 
-    my $user = User::force($c);
+    my $user = Judge::Model::User::force($c);
 
     my $dbh = db->storage->dbh;
 
@@ -98,7 +98,7 @@ sub index
   my $duration = $contest->duration;
 
   $c->stash(
-    user => User::get($c),
+    user => Judge::Model::User::get($c),
     contest => $contest,
     series => $contest->series_id,
     since_start => $since_start,
@@ -121,7 +121,7 @@ sub index
   }
 
   if ($time_elapsed ne 'Finished' and $contest->windowed) {
-    my $user = User::force($c);
+    my $user = Judge::Model::User::force($c);
     $c->stash(user => $user);
 
     my $window = db->resultset('windows')->find({user_id => $user->id, contest_id => $contest->id});
@@ -164,7 +164,7 @@ sub index
         name => "Problems",
         href => "/contest/$id/problems",
       },
-#      ($time_elapsed eq 'Finished' or User::get($c) and User::get($c)->administrator) &&
+#      ($time_elapsed eq 'Finished' or Judge::Model::User::get($c) and Judge::Model::User::get($c)->administrator) &&
 #        {
 #          name => "Writeups",
 #          href => "/contest/$id/writeups",
@@ -181,7 +181,7 @@ sub index
         name => "Submit",
         href => "/contest/$id/submit",
       },
-      ($contest->windowed and User::get($c) and User::get($c)->administrator) && {
+      ($contest->windowed and Judge::Model::User::get($c) and Judge::Model::User::get($c)->administrator) && {
         name => "Windows",
         href => "/contest/$id/windows",
       } || (),

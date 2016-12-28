@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 
 use Database;
-use User;
+use Judge::Model::User;
 use Text::Markdown qw(markdown);
 use File::Basename;
 use feature 'state';
@@ -25,11 +25,11 @@ sub standings
   my %attempts = ();
   my %solved = ();
 
-  my $user = User::get($c);
+  my $user = Judge::Model::User::get($c);
   my $contest = $c->stash->{contest};
 
   if ($contest->windowed) {
-    $user //= User::force($c);
+    $user //= Judge::Model::User::force($c);
     if ($c->stash->{contest_status} ne 'Finished') {
       # Hide submissions from other users
       if (not $user->administrator) {

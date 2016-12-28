@@ -7,10 +7,10 @@ use File::Slurp;
 use File::Spec::Functions;
 use HTML::Defang;
 use HTML::Entities;
-use Problem;
+use Judge::Model::Problem;
 use Settings;
 use Text::Xslate qw(mark_raw);
-use User;
+use Judge::Model::User;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -81,9 +81,9 @@ sub submission
 
   my ($self, $c, $submission_id) = @_;
 
-  my $user = User::get($c);
+  my $user = Judge::Model::User::get($c);
   if (not $c->stash->{contest}->openbook) {
-    $user //= User::force($c);
+    $user //= Judge::Model::User::force($c);
   }
 
   $submission_id = hashids->decrypt($submission_id);
@@ -125,7 +125,7 @@ sub submission
   $source = HTML::Defang->new(fix_mismatched_tags => 1)->defang($source);
 
   my @test_types = ('sample');
-  if ($c->stash->{contest}->openbook || User::get($c) && User::get($c)->administrator) {
+  if ($c->stash->{contest}->openbook || Judge::Model::User::get($c) && Judge::Model::User::get($c)->administrator) {
     # Allow visibility of all test cases for open contests or signed-in administrators
     push @test_types, 'secret';
   }

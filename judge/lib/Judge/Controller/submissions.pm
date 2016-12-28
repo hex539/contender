@@ -4,7 +4,7 @@ use namespace::autoclean;
 
 use Judge::Model::Submission;
 use Database;
-use User;
+use Judge::Model::User;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -18,11 +18,11 @@ sub submissions
 
   my ($self, $c, %args) = @_;
 
-  my $user = User::force($c);
+  my $user = Judge::Model::User::force($c);
 
   my $target_user = undef;
   if (defined $args{user}) {
-    $target_user = User::find($args{user});
+    $target_user = Judge::Model::User::find($args{user});
 
     # TODO redirect this to a nice neat 404 page.
     defined $target_user or warn 'No such user';

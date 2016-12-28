@@ -7,7 +7,7 @@ use warnings;
 use feature 'state';
 
 use Database;
-use User;
+use Judge::Model::User;
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -19,7 +19,7 @@ sub windows
   my ($self, $c, %args) = @_;
   my $contest = $c->stash->{contest};
 
-  return if not User::force($c)->administrator;
+  return if not Judge::Model::User::force($c)->administrator;
   return if not $contest->windowed;
 
   my $results = db->resultset('windows')->search({contest_id => $contest->id}, {
@@ -44,7 +44,7 @@ sub windows
     template => 'windows.tx',
     title => 'Windows',
     tab => 'Windows',
-    user => User::force($c),
+    user => Judge::Model::User::force($c),
     windows => {
       Running  => [grep {not ($_->start_time->epoch + $_->duration <= $c->stash->{now}->epoch)} @windows],
       Finished => [grep {    ($_->start_time->epoch + $_->duration <= $c->stash->{now}->epoch)} @windows],

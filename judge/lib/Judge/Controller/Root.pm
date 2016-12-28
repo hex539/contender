@@ -10,13 +10,13 @@ BEGIN { extends 'Catalyst::Controller' }
 __PACKAGE__->config(namespace => '');
 
 use Settings;
-use User;
+use Judge::Model::User;
 
 sub index :Path :Args(0) {
   my ($self, $c) = @_;
 
   # Is our user signed in?
-  my $user = User::get($c);
+  my $user = Judge::Model::User::get($c);
 
   $c->stash(
     user => $user,

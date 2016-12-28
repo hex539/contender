@@ -4,8 +4,8 @@ use namespace::autoclean;
 
 use File::Slurp;
 use Database;
-use User;
-use Problem;
+use Judge::Model::User;
+use Judge::Model::Problem;
 use HTML::Defang;
 use Text::Markdown qw(markdown);
 use File::Spec::Functions;
@@ -20,7 +20,7 @@ sub edit_problem
 
   my ($self, $c) = @_;
 
-  my $user = User::force($c);
+  my $user = Judge::Model::User::force($c);
   $c->detach('/default') unless $user->administrator;
 
   my $problem = $c->stash->{problem};

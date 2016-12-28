@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 
 use Database;
-use User;
+use Judge::Model::User;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }

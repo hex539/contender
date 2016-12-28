@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 
 use Database;
-use User;
+use Judge::Model::User;
 use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
@@ -14,7 +14,7 @@ sub series
   :Args(1){
 
   my ($self, $c, $series_ref) = @_;
-  $c->stash(user => User::get($c));
+  $c->stash(user => Judge::Model::User::get($c));
   my $now = DateTime->now(time_zone => 'Europe/London');
   $c->stash(now => $now);
 

@@ -3,7 +3,7 @@ use Moose;
 use namespace::autoclean;
 
 use Database;
-use User;
+use Judge::Model::User;
 use File::Basename;
 use File::Spec::Functions;
 use Settings;
@@ -17,7 +17,7 @@ sub submit
   :Args() {
 
   my ($self, $c, $problem_sn) = @_;
-  my $user = User::force($c);
+  my $user = Judge::Model::User::force($c);
 
   $problem_sn //= $c->request->param('problem');
 

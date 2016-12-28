@@ -4,8 +4,8 @@ use namespace::autoclean;
 
 use File::Slurp;
 use Database;
-use User;
-use Problem;
+use Judge::Model::User;
+use Judge::Model::Problem;
 use HTML::Defang;
 use Text::Markdown qw(markdown);
 use File::Spec::Functions;

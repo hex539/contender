@@ -1,6 +1,6 @@
-#!/usr/bin/perl
-
-package User;
+package Judge::Model::User;
+use Moose;
+use namespace::autoclean;
 
 use strict;
 use warnings;
