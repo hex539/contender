@@ -129,7 +129,7 @@ sub submission
     # Allow visibility of all test cases for open contests or signed-in administrators
     push @test_types, 'secret';
   }
-  my $tests = Problem::tests($submission->problem_id, @test_types);
+  my $tests = Judge::Model::Problem::tests($submission->problem_id, @test_types);
 
   my %verdicts = map {$_->testcase => $_->status} db->resultset('judgements')->search({
     submission_id => $submission_id,
