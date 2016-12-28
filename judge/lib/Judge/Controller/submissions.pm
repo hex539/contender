@@ -9,6 +9,8 @@ use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
+use constant SUBMISSIONS_PER_PAGE => 20;
+
 sub submissions
   :Chained("/contest/index")
   :PathPart("submissions")
@@ -33,18 +35,15 @@ sub submissions
     user => $target_user,
   );
 
-  # Pagination of results (TODO move this to a View)
-  my $ipp = 20;
-  my $pagecount = int(($ipp - 1 + $results->count) / $ipp) || 1;
-  $args{page} = int($args{page} // 1);
-  $args{page} = 1          if $args{page} < 1;
-  $args{page} = $pagecount if $args{page} > $pagecount;
-  my @submissions = $results->search({}, {rows => $ipp})->page($args{page})->all;
-
-  # Buttons for pagination (TODO move this to a View)
-  my @pages = ($args{page});
-  $pages[0]-- while 1 < $pages[0] and ($args{page} - $pages[0] < 2 or $pages[0] + 4 > $pagecount);
-  push @pages, $pages[$#pages] + 1 while @pages < 5 and $pages[$#pages] < $pagecount;
+  my $pager = undef;
+  if (exists $args{page} or not $user->administrator) {
+    $results = $results->search({}, {
+      rows => SUBMISSIONS_PER_PAGE,
+      page => int($args{page} // 1),
+    });
+    $pager = $results->pager;
+  }
+  my @submissions = $results->all;
 
   $c->stash(
     template => 'submissions.tx',
@@ -53,9 +52,7 @@ sub submissions
     user => $user,
 
     submissions => \@submissions,
-    pagecount => $pagecount,
-    page => $args{page},
-    pages => \@pages,
+    pager => $pager,
   );
 }
 

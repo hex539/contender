@@ -8,13 +8,17 @@
       (<: $contest_status :>)
       : }
     </header>
-    : if $pagecount > 1 {
+    : if $pager {
     <ul class="paginator">
-      <li><a href="/contest/<: $contest.id :>/submissions/page/<: ($page - 1) max 1 :>" class="<: $page == 1? 'inactive': '' :>">&larr;</a></li>
-      : for $pages -> $row {
-      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $row :>" class="<: $row == $page? 'chosen': '' :>"><: $row :></a></li>
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $pager.first_page :>" class="<: $pager.previous_page ? '' : 'inactive' :>">&larr;</a></li>
+      : if $pager.previous_page {
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $pager.previous_page :>"><: $pager.previous_page :></a></li>
       : }
-      <li><a href="/contest/<: $contest.id :>/submissions/page/<: ($page + 1) min $pagecount :>" class="<: $page == $pagecount? 'inactive': '' :>">&rarr;</a></li>
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $pager.current_page :>" class="chosen"><: $pager.current_page :></a></li>
+      : if $pager.next_page {
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $pager.next_page :>"><: $pager.next_page :></a></li>
+      : }
+      <li><a href="/contest/<: $contest.id :>/submissions/page/<: $pager.last_page :>" class="<: $pager.next_page ? '' : 'inactive' :>">&rarr;</a></li>
     </ul>
     : }
     <table class="submissions">

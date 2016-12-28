@@ -1,4 +1,5 @@
 AuthCAS
+DBIx::Class
 Catalyst::Plugin::ConfigLoader
 Catalyst::Plugin::Redirect
 Catalyst::Plugin::Session::State::Cookie
@@ -6,6 +7,7 @@ Catalyst::Plugin::Session::Store::FastMmap
 Catalyst::Plugin::Static::Simple
 Catalyst::ScriptRunner
 Catalyst::View::Xslate
+Data::Page
 DateTime::Format::Pg
 Hashids
 HTML::Defang
