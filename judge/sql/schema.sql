@@ -30,16 +30,16 @@ CREATE TABLE "series" (
 
 DROP TABLE IF EXISTS "contests" CASCADE;
 CREATE TABLE "contests" (
-  "id"            serial          NOT NULL PRIMARY KEY,
-  "shortname"     varchar(255)    NOT NULL,
-  "name"          varchar(255)    DEFAULT NULL,
-  "series_id"     integer         DEFAULT NULL REFERENCES "series" ("id") ON DELETE CASCADE,
-  "start_time"    timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "duration"      interval        DEFAULT NULL,
-  "visible"       boolean         NOT NULL,
-  "openbook"      boolean         NOT NULL DEFAULT false,
-  "windowed"      boolean         NOT NULL DEFAULT false,
-  "penalty"       integer         NOT NULL DEFAULT 20
+  "id"              serial          NOT NULL PRIMARY KEY,
+  "shortname"       varchar(255)    NOT NULL,
+  "name"            varchar(255)    DEFAULT NULL,
+  "series_id"       integer         DEFAULT NULL REFERENCES "series" ("id") ON DELETE CASCADE,
+  "start_time"      timestamp       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "duration"        interval        DEFAULT NULL,
+  "visible"         boolean         NOT NULL,
+  "openbook"        boolean         NOT NULL DEFAULT false,
+  "window_duration" interval        DEFAULT NULL,
+  "penalty"         integer         NOT NULL DEFAULT 20
 );
 
 

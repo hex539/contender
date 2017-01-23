@@ -8,8 +8,10 @@ Catalyst::Plugin::Static::Simple
 Catalyst::ScriptRunner
 Catalyst::View::Xslate
 Data::Page
+DateTime::Duration
 DateTime::Format::Pg
 Hashids
 HTML::Defang
 Syntax::Highlight::Engine::Kate::Python
 Text::Markdown
+Time::Duration
