@@ -8,6 +8,7 @@ use feature 'state';
 
 use Database;
 use Judge::Model::User;
+use Judge::Model::Scoreboard;
 use JSON;
 
 BEGIN { extends 'Catalyst::Controller::REST'; }
@@ -46,6 +47,34 @@ sub affiliations_GET
   );
 }
 
+sub contest : Local : ActionClass('REST') {}
+sub contest_GET
+    :Chained("/api")
+    :PathPart("contest")
+    :Args(0) {
+  my ($self, $c) = @_;
+
+  my $contest = db->resultset('contests')->find({
+    visible => 1,
+  });
+  if (not defined $contest) {
+    $self->status_no_content;
+    return;
+  }
+
+  $self->status_ok(
+    $c,
+    entity => {
+      id => $contest->id,
+      shortname => $contest->shortname,
+      name => $contest->name,
+      start => $contest->start_time,
+      length => ($contest->window_duration // $contest->duration),
+      penalty => $contest->penalty,
+    },
+  );
+}
+
 sub teams : Local : ActionClass('REST') {}
 sub teams_GET
     :Chained("/api")
@@ -74,24 +103,41 @@ sub scoreboard_GET
   my ($self, $c) = @_;
   my $contest_id = 1;
 
+  my $user = Judge::Model::User::get($c) // die 'no user';
+  my $contest = db->resultset('contests')->find({
+    visible => 1,
+   }) // die 'no contest';
+
+  my $scoreboard = Judge::Model::Scoreboard->new(
+    contest => $contest,
+    user => $user
+  ) // die 'no scoreboard';
+
+  my $problems = $scoreboard->problems;
+
   my @rows = ();
-  push @rows, {
-    rank => 1,
-    team => 555,
-    score => {
-      num_solved => 7,
-      total_time => 1157,
-    },
-    problems => [
-      {
-        label => "A",
-        num_judged => 1,
-        num_pending => 0,
-        solved => JSON::true,
-        time => 33,
-      }
-    ],
-  };
+  my $rank = 0;
+  for my $row (@{$scoreboard->scoreboard_rows}) {
+    $rank++;
+
+    push @rows, {
+      rank => $rank,
+      team => $row->{user}->id,
+      score => {
+        num_solved => $row->{score},
+        total_time => $row->{penalty},
+      },
+      problems => [
+        map {{
+          label => $_->shortname,
+          num_judged => $row->{$_->id}->{attempts},
+          num_pending => 0,
+          solved => ($row->{$_->id}->{solved} ? JSON::true : JSON::false),
+          time => ($row->{$_->id}->{solved} && $row->{$_->id}->{when}),
+        }} @{$problems},
+      ],
+    };
+  }
 
   $self->status_ok(
     $c,
