@@ -22,8 +22,11 @@
           <td><: $problem.shortname :></td>
           <td><a href="/contest/<: $contest.id :>/problem/<: $problem.shortname :>"><: $problem.name :></a></td>
           <td><:
-            if $solved[$problem.id] == 'yes' { '✔' } else
-            if $solved[$problem.id] == 'no'  { '✘' } :></td>
+            if defined($solved[$problem.id]) {
+              if $solved[$problem.id]['solved'] > 0 { '✔' } else
+              if $solved[$problem.id]['pending'] > 0 { '?' } else
+              if $solved[$problem.id]['attempts'] > 0  { '✘' }
+            } :></td>
         </tr>
         : }
       </tbody>

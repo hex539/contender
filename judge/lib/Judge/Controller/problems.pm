@@ -29,10 +29,19 @@ sub problems
     while (my $row = $results->next) {
       next unless $row->status;
 
-      $solved{$row->problem_id->id} //= 'no';
-
+      $solved{$row->problem_id->id} //= {
+        attempts => 0,
+        pending => 0,
+        solved => 0,
+      };
+      if (1) {
+        $solved{$row->problem_id->id}->{attempts}++;
+      }
+      if ($row->status eq 'WAITING') {
+        $solved{$row->problem_id->id}->{pending}++;
+      }
       if ($row->status eq 'OK') {
-        $solved{$row->problem_id->id} = 'yes';
+        $solved{$row->problem_id->id}->{solved}++;
       }
     }
   }
