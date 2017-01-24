@@ -321,12 +321,16 @@ table {
   padding: 1em 1em;
 }
 
+tbody tr {
+  height: 2em;
+}
+
 table th {
   padding: 0.25em 0em;
 }
 
 table td {
-  padding: 0.25em 0em;
+  padding: 0em 0.25em;
 }
 
 img.flag {
