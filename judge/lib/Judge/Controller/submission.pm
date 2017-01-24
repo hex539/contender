@@ -88,12 +88,12 @@ sub submission
 
   $submission_id = hashids->decrypt($submission_id);
 
-  my $submission = db->resultset('submissions')->search({
+  my $submission = db->resultset('submissions')->find({
     contest_id => $c->stash->{contest}->id,
     'me.id' => $submission_id,
   }, {
     join => 'problem_id',
-  })->next;
+  });
 
   return $c->detach('/default') if not $submission;
   return $c->detach('/default') if not $c->stash->{contest}->openbook and (not defined $user || $user->id != $submission->user_id->id && not $user->administrator);
