@@ -113,21 +113,17 @@ sub index
         user_id => $user->id,
         contest_id => $contest->id
     });
-    $c->stash(window => $window);
 
-    # Window has not started yet
-    if (not defined $window) {
-      $c->detach('/contest/startpage');
-      return;
+    if (defined $window) {
+      $c->stash(
+        window => $window,
+        start_time => $window->start_time,
+        end_time => $window->end_time,
+      );
     }
 
-    $c->stash(
-      start_time => $window->start_time,
-      end_time => $window->end_time,
-    );
-
-    # Window has expired
-    if ($window->end_time->epoch <= $now->epoch) {
+    # Window is not started yet, or has expired
+    if ((not defined $window) || (not $window->running($now))) {
       $c->detach('/contest/startpage');
       return;
     }
