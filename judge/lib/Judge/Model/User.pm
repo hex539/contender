@@ -85,4 +85,22 @@ sub find {
   });
 }
 
+sub start_window {
+  @ >= 1 or die 'No arguments';
+  my %args = @_;
+  my $user = $args{user} // die 'user not specified: ' . (join ' ', @_);
+  my $contest = $args{contest} // die 'contest not specified';
+
+  my $dbh = db->storage->dbh;
+
+  my $window = db->resultset('windows')->new_result({
+      contest_id => $contest->id,
+      user_id => $user->id,
+      duration => $contest->window_duration,
+  });
+  $window->insert;
+
+  return $window;
+}
+
 1;

@@ -2,12 +2,17 @@ package Judge::Controller::contest;
 use Moose;
 use namespace::autoclean;
 
+use strict;
+use warnings;
+use feature 'state';
+
 use DateTime;
 use Database;
 use Settings;
 use Judge::Model::User;
 use HTML::Entities;
-use feature 'state';
+use Time::Duration;
+use Text::Xslate qw(mark_raw);
 
 BEGIN { extends 'Catalyst::Controller'; }
 
@@ -44,9 +49,15 @@ sub startpage
   :Path('startpage') {
   my ($self, $c, $id) = @_;
 
+  my $contest = $c->stash->{contest};
+
+  my $now = DateTime->now(time_zone => 'Europe/London');
+  my $window_finish = $now->clone->add_duration($contest->window_duration);
+
   $c->stash(
     title => $c->stash->{contest}->name,
     template => 'startpage.tx',
+    nice_window_duration => duration($window_finish->epoch - $now->epoch),
   );
 
   return;
@@ -70,94 +81,81 @@ sub index
     $c->detach('/default') unless Judge::Model::User::force($c)->administrator;
   }
 
-  if (exists $c->request->body_parameters->{start_contest} and $contest->windowed) {
-#     Judge::Model::User::force($c)->start_window($contest);
-
-    my $user = Judge::Model::User::force($c);
-
-    my $dbh = db->storage->dbh;
-
-    my $sth = $dbh->prepare('
-      INSERT IGNORE INTO windows (contest_id, user_id, start_time, duration)
-           VALUES (?, ?, NOW(), ?)');
-
-    my $duration = 3 * 60 * 60;
-    $sth->execute($contest->id, $user->id, $duration);
-    $dbh->commit;
-
-    $c->redirect('https://hex539.me/contest/' . $contest->id . '/problems');
-    $c->detach;
-  }
-
   my $now = DateTime->now(time_zone => 'Europe/London');
-  my $since_start = $now->epoch - $contest->start_time->epoch;
-  my $until_end   = ($contest->duration // $since_start) - $since_start;
-  my $time_elapsed = (defined $since_start) && sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0]) || undef;
-  my $nice_duration = (defined $contest->duration) && sprintf('%02d:%02d:%02d', (gmtime $contest->duration)[2,1,0]) || undef;
-  my $start_time = $contest->start_time;
-  my $duration = $contest->duration;
-
   $c->stash(
     user => Judge::Model::User::get($c),
     contest => $contest,
     series => $contest->series_id,
-    since_start => $since_start,
-    until_end => $until_end,
-    duration => $duration,
-    contest_status => (
-      ($until_end >= 0 or not defined $contest->duration)? 'Running': 'Finished',
-    ),
+    start_time => $contest->start_time,
+    end_time => $contest->end_time,
     now => $now,
     hashids => hashids,
   );
 
-  if ($since_start < 0) {
+  # Contest has not started yet
+  if (defined($contest->start_time) && $now->epoch < $contest->start_time->epoch) {
     $c->detach('/contest/waitpage');
     return;
   }
 
-  if ($until_end < 0) {
-    $time_elapsed = 'Finished';
-  }
-
-  if ($time_elapsed ne 'Finished' and $contest->windowed) {
+  if ($contest->running($now) && $contest->windowed) {
     my $user = Judge::Model::User::force($c);
     $c->stash(user => $user);
 
-    my $window = db->resultset('windows')->find({user_id => $user->id, contest_id => $contest->id});
+    if (exists $c->request->body_parameters->{start_contest}) {
+      my $user = Judge::Model::User::force($c) // die 'No user';
+      Judge::Model::User::start_window(user => $user, contest => $contest);
+      $c->redirect('https://hex539.me/contest/' . $contest->id . '/problems');
+      $c->detach;
+    }
+
+    my $window = db->resultset('windows')->find({
+        user_id => $user->id,
+        contest_id => $contest->id
+    });
     $c->stash(window => $window);
 
-    if (not $window) {
+    # Window has not started yet
+    if (not defined $window) {
       $c->detach('/contest/startpage');
       return;
     }
 
-    $since_start = $now->epoch - $window->start_time->epoch;
-    $until_end = $window->duration - $since_start;
-    $nice_duration = sprintf('%02d:%02d:%02d', (gmtime ($window->duration))[2,1,0]);
-    $start_time = $window->start_time;
-    $duration = $window->duration;
-
     $c->stash(
-      since_start => $since_start,
-      until_end => $until_end,
-      duration => $duration,
+      start_time => $window->start_time,
+      end_time => $window->end_time,
     );
 
-    $time_elapsed = sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0]);
-
     # Window has expired
-    if ($since_start < 0 or $until_end < 0) {
+    if ($window->end_time->epoch <= $now->epoch) {
       $c->detach('/contest/startpage');
       return;
     }
   }
 
-  use Text::Xslate qw(mark_raw);
+  my $since_start = (defined($c->stash->{start_time})
+      ? $now->epoch - $c->stash->{start_time}->epoch
+      : undef);
+  my $until_end = (defined($c->stash->{end_time})
+      ? $c->stash->{end_time}->epoch - $now->epoch
+      : undef);
+  my $time_elapsed = (defined($since_start)
+      ? sprintf('%02d:%02d:%02d', (gmtime $since_start)[2,1,0])
+      : undef);
+  my $contest_status = (defined $until_end && $until_end < 0
+      ? 'Finished'
+      : 'Running');
+  my $nice_duration = (defined($c->stash->{start_time}) && defined($c->stash->{end_time})
+      ? sprintf('%02d:%02d:%02d', $c->stash->{end_time}
+                                  ->subtract_datetime($c->stash->{start_time})
+                                  ->in_units('hours', 'minutes', 'seconds'))
+      : undef);
+
   $c->stash(
     since_start => $since_start,
     until_end => $until_end,
-    start_time => $start_time,
+    time_elapsed => $time_elapsed,
+    contest_status => $contest_status,
 
     tabs => [grep {$_}
       {
@@ -188,7 +186,7 @@ sub index
     ],
 
     widgets => [
-      (defined $contest->duration) && {
+      (defined $nice_duration) && {
         id => 'small_contest_state',
         title => 'Contest state',
         text => mark_raw(<<HTML . ($since_start >= 0 and $until_end >= 0? <<HTML: '')),

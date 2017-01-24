@@ -7,16 +7,16 @@
   <form action="/contest/<: $contest.id :>/problems" method="POST">
     <fieldset>
       :
-      : if $until_end < 0 {
-      :
-      <p><strong>Your submission window has now expired.</strong></p>
-      You will receive an email after all other participants' windows have completed.
-      :
-      : } elsif $since_start < 0 {
+      : if defined($contest) && $now.epoch < $contest.start_time.epoch {
       :
       The contest will start at <: $contest.start_time.ymd :> / <: $contest.start_time.hms :>.
       :
-      : } elsif $window {
+      : } elsif defined($window) && $window.end_time.epoch <= $now.epoch {
+      :
+      <p><strong>Your submission window has now expired.</strong></p>
+      <p>You will receive an email after all other participants' windows have completed.</p>
+      :
+      : } elsif defined($window) {
       :
       <p><strong>Your session has now started.</strong></p>
       <p><a href="/contest/<: $contest.id :>/problems">Click here</a> to access the problems.</p>
@@ -24,9 +24,15 @@
       : } else {
       :
       <p><strong>You have not started your session yet.</strong></p>
-      <p>It is permitted to start your session at any time within the next <: ($until_end - ($until_end % 3600)) / 3600 :> hours (<: ($until_end - ($until_end % 86400)) / 86400 :> days).</p>
-      <p>The submission window will last for <: '3' :> hours, after which your submit rights will be revoked.</p>
-      <input name="start_contest" type="submit" value="Start the timer now" />
+      <p>It is permitted to start your session at any time
+        : if defined($until_end) {
+          within the next <:
+            ($until_end - ($until_end % 3600)) / 3600 :> hours (<: ($until_end - ($until_end % 86400)) / 86400 :> days)
+        : }
+      .</p>
+      <p>The submission window will last for <: $nice_window_duration :>,
+         after which your submit rights will be revoked.</p>
+      <p><input name="start_contest" type="submit" value="Start the timer now" /></p>
       <p><em class="danger">Be very careful about clicking that button precipitately.</em></p>
       :
       : }

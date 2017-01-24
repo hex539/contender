@@ -46,8 +46,8 @@ sub windows
     tab => 'Windows',
     user => Judge::Model::User::force($c),
     windows => {
-      Running  => [grep {not ($_->start_time->epoch + $_->duration <= $c->stash->{now}->epoch)} @windows],
-      Finished => [grep {    ($_->start_time->epoch + $_->duration <= $c->stash->{now}->epoch)} @windows],
+      Running  => [grep {not ($_->end_time->epoch <= $c->stash->{now}->epoch)} @windows],
+      Finished => [grep {    ($_->end_time->epoch <= $c->stash->{now}->epoch)} @windows],
     },
     pagecount => $pagecount,
     page => $args{page},
