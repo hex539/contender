@@ -62,4 +62,22 @@ sub end_time {
   return $self->start_time->clone->add_duration($duration);
 }
 
+sub running {
+  @_ == 2 or die 'Wrong number of arguments';
+  my $self = shift // die;
+  my $now = shift // die;
+
+  my $start_time = $self->start_time;
+  if (defined($start_time) && $now->epoch < $start_time->epoch) {
+    return 0;
+  }
+
+  my $end_time = $self->end_time;
+  if (defined($end_time) && $end_time->epoch <= $now->epoch) {
+    return 0;
+  }
+
+  return 1;
+}
+
 1;
