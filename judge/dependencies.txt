@@ -1,5 +1,6 @@
 AuthCAS
 DBIx::Class
+Catalyst::Controller::REST
 Catalyst::Plugin::ConfigLoader
 Catalyst::Plugin::Redirect
 Catalyst::Plugin::Session::State::Cookie
