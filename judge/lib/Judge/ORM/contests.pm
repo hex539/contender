@@ -27,6 +27,15 @@ __PACKAGE__->add_columns(
     'is_nullable'       => 1,
     'size'              => '11',
   },
+  'shortname' => {
+    'data_type'         => 'VARCHAR',
+    'is_auto_increment' => 0,
+    'default_value'     => undef,
+    'is_foreign_key'    => 0,
+    'name'              => 'shortname',
+    'is_nullable'       => 1,
+    'size'              => '255'
+  },
   'name' => {
     'data_type'         => 'VARCHAR',
     'is_auto_increment' => 0,
@@ -79,6 +88,15 @@ __PACKAGE__->add_columns(
     'default_value'     => 0,
     'is_foreign_key'    => 0,
     'name'              => 'openbook',
+    'is_nullable'       => 0,
+    'size'              => '1'
+  },
+  'penalty' => {
+    'data_type'         => 'int',
+    'is_auto_increment' => 0,
+    'default_value'     => 0,
+    'is_foreign_key'    => 0,
+    'name'              => 'penalty',
     'is_nullable'       => 0,
     'size'              => '1'
   },
