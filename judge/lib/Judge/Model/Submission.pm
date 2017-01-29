@@ -17,43 +17,43 @@ BEGIN {extends 'Catalyst::Model'; }
 sub list {
   my %args = @_;
 
-  my $requester = $args{requester};
-  my $contest_id = $args{contest_id};
-  my $user = $args{user};
-  my $problem_letter = $args{problem};
+  my $requester = $args{requester};     # Required
+  my $contest_id = $args{contest_id};   # Optional
+  my $user = $args{user};               # Optional
+  my $problem_letter = $args{problem};  # Optional
 
   defined $requester or die 'Need a requester to list submissions';
+  my $contest = undef;
 
   my $results = db->resultset('submissions')->search(undef, {
     join => 'problem_id',
     order_by => {'-desc' => 'time'},
-  });;
+  });
 
-  if (defined (my $contest_id = $args{contest_id})) {
-    $results = $results->search({contest_id => $contest_id});
+  if (defined ($contest_id)) {
+    $contest = db->resultset('contests')->find({id => $contest_id}) or die 'Contest does not exist';
+    $results = $results->search({contest_id => $contest->id});
   }
 
-  if (defined (my $user = $args{user})) {
+  if (defined $user) {
     if ($user->id != $requester->id) {
       defined $requester && $requester->administrator
           or die 'Requester needs to be an administrator list other users\' submissions';
     }
     $results = $results->search({user_id => $user->id});
   } else {
-    if (defined $contest_id && !$contest_id->windowed) {
+    if ((defined $contest) && not $contest->windowed) {
       # Allow searching all submissions.
     } else {
-      defined $requester && $requester->administrator
-          or die 'Requester needs to be an administrator to list all submissions';
+      $requester->administrator or die 'Requester needs to be an administrator to list all submissions';
     }
   }
 
-  if (defined (my $problem_letter = $args{problem})) {
-    defined $contest_id
-        or die 'Problem letter given but not contest ID';
+  if (defined $problem_letter) {
+    defined $contest or die 'Problem letter given but not contest';
 
     my $problem = db->resultset('problems')->find({
-      contest_id => $contest_id,
+      contest_id => $contest->id,
       shortname => $problem_letter,
     });
     if (defined $problem) {

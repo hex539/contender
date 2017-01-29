@@ -8,6 +8,7 @@ use File::Spec::Functions;
 use HTML::Defang;
 use HTML::Entities;
 use Judge::Model::Problem;
+use Judge::View::SourceCode;
 use Settings;
 use Text::Xslate qw(mark_raw);
 use Judge::Model::User;
@@ -15,64 +16,7 @@ use feature 'state';
 
 BEGIN { extends 'Catalyst::Controller'; }
 
-sub format_table {
-  {
-     Alert => ["<font color=\"#0000ff\">", "</font>"],
-     BaseN => ["<font color=\"#007f00\">", "</font>"],
-     BString => ["<font color=\"#c9a7ff\">", "</font>"],
-     Char => ["<font color=\"#ff00ff\">", "</font>"],
-     Comment => ["<font color=\"#7f7f7f\"><i>", "</i></font>"],
-     DataType => ["<font color=\"#0000ff\">", "</font>"],
-     DecVal => ["<font color=\"#00007f\">", "</font>"],
-     Error => ["<font color=\"#ff0000\"><b><i>", "</i></b></font>"],
-     Float => ["<font color=\"#00007f\">", "</font>"],
-     Function => ["<font color=\"#007f00\">", "</font>"],
-     IString => ["<font color=\"#ff0000\">", ""],
-     Keyword => ["<b>", "</b>"],
-     Normal => ["", ""],
-     Operator => ["<font color=\"#ffa500\">", "</font>"],
-     Others => ["<font color=\"#b03060\">", "</font>"],
-     RegionMarker => ["<font color=\"#96b9ff\"><i>", "</i></font>"],
-     Reserved => ["<font color=\"#9b30ff\"><b>", "</b></font>"],
-     String => ["<font color=\"#ff0000\">", "</font>"],
-     Variable => ["<font color=\"#0000ff\"><b>", "</b></font>"],
-     Warning => ["<font color=\"#0000ff\"><b><i>", "</b></i></font>"],
-  }
-}
-
-sub highlighter {
-  @_ == 1 or die;
-  my $ext = shift;
-
-  state $substitutions = {
-   "<" => "&lt;",
-   ">" => "&gt;",
-   "&" => "&amp;",
-   "\t" => "  ",
-  };
-  my @hl_args = (substitutions => $substitutions, format_table => format_table);
-
-  my $hl = undef;
-  eval {
-    if ($ext eq 'py' or $ext eq 'pypy' or $ext eq 'python') {
-      use Syntax::Highlight::Engine::Kate::Python;
-      $hl = new Syntax::Highlight::Engine::Kate::Python(@hl_args);
-    }
-    elsif ($ext eq 'cc' or $ext eq 'c' or $ext eq 'cpp' or $ext eq 'cxx') {
-      use Syntax::Highlight::Engine::Kate::Cplusplus;
-      $hl = new Syntax::Highlight::Engine::Kate::Cplusplus(@hl_args);
-    }
-    elsif ($ext eq 'java') {
-      use Syntax::Highlight::Engine::Kate::Java;
-      $hl = new Syntax::Highlight::Engine::Kate::Java(@hl_args);
-    }
-    elsif ($ext eq 'matlab' or $ext eq 'm' or $ext eq 'octave') {
-      use Syntax::Highlight::Engine::Kate::Matlab;
-      $hl = new Syntax::Highlight::Engine::Kate::Matlab(@hl_args);
-    }
-  };
-  return $hl;
-}
+use constant MAX_IO_LENGTH => 2048;
 
 sub submission
   :Chained("/contest/index")
@@ -96,28 +40,35 @@ sub submission
   });
 
   return $c->detach('/default') if not $submission;
-  return $c->detach('/default') if not $c->stash->{contest}->openbook and (not defined $user || $user->id != $submission->user_id->id && not $user->administrator);
-  my $id = $submission->id;
+  if (not $c->stash->{contest}->openbook) {
+    return $c->detach('/default') if not $user
+        || $user->id != $submission->user_id->id && not $user->administrator;
+  }
 
   my $source = '';
   my $compiler_output = '';
 
   eval {
-    $compiler_output = read_file(judgeroot . "/submissions/$id/compile.log") || '';
+    $compiler_output = read_file(catfile(judgeroot, 'submissions', $submission->id, 'compile.log'));
+    $compiler_output //= '';
     $compiler_output =~ s/^\s+\n//g;
     $compiler_output =~ s/\s+$//g;
   };
 
   eval {
-    my $jr = judgeroot;
-    my $fname = `ls "$jr/submissions/$id/" | fgrep -v .log`;
-    $fname =~ s/\s//g;
-    $source = read_file(judgeroot . "/submissions/$id/$fname");
+    my $submission_dir = catdir(judgeroot, "submissions", $submission->id);
+    opendir(my $dh, $submission_dir) or die "Can't open submission directory";
+
+    my @submission_files = grep {!/^\.|\.log$/ && -f "$submission_dir/$_"} readdir $dh;
+
+    @submission_files or die("No files for submission " . $submission->id);
+
+    $source = read_file(catfile($submission_dir, $submission_files[0]));
     $source =~ s/^\s+\n//g;
     $source =~ s/\s+$//g;
 
-    (my $ext = $fname) =~ s/^.*\.//g;
-    if (my $hl = highlighter($ext)) {
+    (my $ext = $submission_files[0]) =~ s/^.*\.//g;
+    if (my $hl = Judge::View::SourceCode::highlighter($ext)) {
       $source = $hl->highlightText($source);
     }
   };
@@ -125,7 +76,7 @@ sub submission
   $source = HTML::Defang->new(fix_mismatched_tags => 1)->defang($source);
 
   my @test_types = ('sample');
-  if ($c->stash->{contest}->openbook || Judge::Model::User::get($c) && Judge::Model::User::get($c)->administrator) {
+  if ($c->stash->{contest}->openbook || defined($user) && $user->administrator) {
     # Allow visibility of all test cases for open contests or signed-in administrators
     push @test_types, 'secret';
   }
@@ -138,22 +89,22 @@ sub submission
   for my $test (@$tests) {
     $test->{received} = '';
     eval {
-      $test->{received} = read_file(catfile(judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.out'));
+      $test->{received} = read_file(catfile(judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.out')) // '';
     };
     $test->{stderr} = '';
     eval {
-      $test->{stderr} = read_file(catfile(judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.err'));
+      $test->{stderr} = read_file(catfile(judgeroot, 'runs', $submission->id, $test->{type} . $test->{id} . '.err')) // '';
     };
 
-    $test->{input} = substr $test->{input}, 0, 2048;
-    $test->{output} = substr $test->{output}, 0, 2048;
-    $test->{received} = substr $test->{received}, 0, 2048;
+    $test->{input} = substr $test->{input}, 0, MAX_IO_LENGTH;
+    $test->{output} = substr $test->{output}, 0, MAX_IO_LENGTH;
+    $test->{received} = substr $test->{received}, 0, MAX_IO_LENGTH;
     $test->{status} = $verdicts{$test->{type} . $test->{id}} // 'WAITING';
   }
 
   $c->stash(
     template => 'submission.tx',
-    title => 'Submission #' . int($submission_id),
+    title => 'Submission #' . $submission->id,
     tab => 'Submissions',
     user => $user,
 
@@ -165,5 +116,3 @@ sub submission
 }
 
 __PACKAGE__->meta->make_immutable;
-
-1;

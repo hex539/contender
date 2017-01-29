@@ -79,7 +79,7 @@ __PACKAGE__->add_columns(
     'default_value'     => undef,
     'is_foreign_key'    => 0,
     'name'              => 'window_duration',
-    'is_nullable'       => 0,
+    'is_nullable'       => 1,
     'size'              => '11'
   },
   'openbook' => {
